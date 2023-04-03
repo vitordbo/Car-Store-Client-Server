@@ -7,8 +7,8 @@ import teste2.interfaces.Loja;
 public class Cliente {
     public static void main(String[] args) {
         try {
-            Registry registro = LocateRegistry.getRegistry("localhost", Registry.REGISTRY_PORT);
-            Loja loja = (Loja) registro.lookup("Loja");
+            Registry registro = LocateRegistry.getRegistry("localhost", 20003); //Registry.REGISTRY_PORT
+            Loja objetoRemoto = (Loja) registro.lookup("Loja");
 
             System.out.println("Bem-vindo à loja de carros!");
 
@@ -25,24 +25,20 @@ public class Cliente {
 
                 switch(opcao) {
                     case 1:
-                        System.out.println("\nDigite a categoria dos carros que deseja listar:");
-                        String categoria = System.console().readLine();
-                        loja.listarCarros();
+                        objetoRemoto.listarCarros();
                         break;
                     case 2:
                         System.out.println("\nDigite o nome do carro que deseja pesquisar:");
                         String chave = System.console().readLine();
-                        loja.pesquisarCarro(chave);
+                        objetoRemoto.pesquisarCarro(chave);
                         break;
                     case 3:
-                        loja.exibirQuantidadeCarros();
+                        objetoRemoto.exibirQuantidadeCarros();
                         break;
                     case 4:
                         System.out.println("\nDigite o nome do carro que deseja comprar:");
                         String nomeCarro = System.console().readLine();
-                        System.out.println("\nDigite a quantidade que deseja comprar:");
-                        int quantidade = Integer.parseInt(System.console().readLine());
-                        loja.comprarCarro(nomeCarro, quantidade);
+                        objetoRemoto.comprarCarro(nomeCarro);
                         break;
                     case 0:
                         System.out.println("\nObrigado por utilizar a loja de carros!");

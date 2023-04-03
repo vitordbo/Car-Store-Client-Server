@@ -33,8 +33,8 @@ public class CarroImpl implements Carro {
     @Override
     public String toString() {
         return "Carro [nome=" + nome + ", cor=" + cor + ", renavan=" + renavan + ", cor=" + cor + 
-        ", categoria=" + categoria + ", ano=" + ano + ", preco=" + preco + ", vendido=" + vendido + ", 
-        quantidade disponivel=" + quantidadeDisponivel + "]";
+        ", categoria=" + categoria + ", ano=" + ano + ", preco=" + preco + ", vendido=" + vendido + 
+        ", quantidade disponivel=" + quantidadeDisponivel + "]";
     }
 
 
