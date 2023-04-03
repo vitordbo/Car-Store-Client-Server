@@ -1,13 +1,13 @@
 package teste2.imple;
 
+import java.io.Serializable;
 import java.rmi.RemoteException;
 
 import teste2.interfaces.Carro;
 
-public class CarroImpl implements Carro {
+public class CarroImpl implements Carro, Serializable {
     private String nome;
     private String renavan;
-    private String cor;
     private String categoria;
     private int ano;
     private double preco;
@@ -18,11 +18,10 @@ public class CarroImpl implements Carro {
       
     }
 
-    public CarroImpl(String nome, String renavan, String cor, String categoria, int ano, double preco, 
+    public CarroImpl(String nome, String renavan, String categoria, int ano, double preco, 
     boolean vendido, int quantidadeDisponivel) {
         this.nome = nome;
         this.renavan = renavan;
-        this.cor = cor;
         this.categoria = categoria;
         this.ano = ano;
         this.preco = preco;
@@ -32,8 +31,8 @@ public class CarroImpl implements Carro {
 
     @Override
     public String toString() {
-        return "Carro [nome=" + nome + ", cor=" + cor + ", renavan=" + renavan + ", cor=" + cor + 
-        ", categoria=" + categoria + ", ano=" + ano + ", preco=" + preco + ", vendido=" + vendido + 
+        return "Carro [nome=" + nome + ", renavan=" + renavan + ", categoria=" + categoria + 
+        ", ano=" + ano + ", preco=" + preco + ", vendido=" + vendido + 
         ", quantidade disponivel=" + quantidadeDisponivel + "]";
     }
 
@@ -74,11 +73,6 @@ public class CarroImpl implements Carro {
     }
 
     @Override
-    public String getCor() throws RemoteException {
-       return cor;
-    }
-
-    @Override
     public void setNome(String nome) throws RemoteException {
        this.nome = nome;
     }
@@ -86,11 +80,6 @@ public class CarroImpl implements Carro {
     @Override
     public void setRenavan(String renavan) throws RemoteException {
        this.renavan = renavan;
-    }
-
-    @Override
-    public void setCor(String cor) throws RemoteException {
-       this.cor = cor;
     }
 
     @Override
