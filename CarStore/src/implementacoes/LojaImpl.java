@@ -16,7 +16,11 @@ import usuarios.Cliente;
 import usuarios.Funcionario;
 import usuarios.User;
 
-public class LojaImpl extends UnicastRemoteObject implements Loja {
+import java.io.Serializable;
+
+public class LojaImpl implements Loja, Serializable {
+
+    private static final long serialVersionUID = 1;
 
     private List<CarroImpl> carros;
     private static List<Cliente> clientes;
