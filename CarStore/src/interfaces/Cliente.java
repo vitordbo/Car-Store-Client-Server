@@ -4,6 +4,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 public interface Cliente extends Remote {
+    
     public void listarCarros(String categoria) throws RemoteException;
     public void pesquisarCarro(String chave) throws RemoteException;
     public void exibirQuantidadeCarros() throws RemoteException;

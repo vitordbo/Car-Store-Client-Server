@@ -2,8 +2,10 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.Scanner;
 
-import imple.CarroImpl;
+import implementacoes.CarroImpl;
 import interfaces.Loja;
+import usuarios.Funcionario;
+import usuarios.User;
 
 public class Cliente {
     public static void main(String[] args) {
@@ -20,6 +22,30 @@ public class Cliente {
             }
 
             System.out.println("Bem-vindo à loja de carros!");
+            User user;
+            String login;
+
+            do {
+                System.out.println("Digite seu Login: ");
+                login = System.console().readLine();
+                System.out.println("Digite sua senha: ");
+                String senha = System.console().readLine();
+                
+                // autenticar com login e senha => pegar retorno com isntance of e fazer o switch diferente
+                user = objetoRemoto.autenticar(login, senha);
+                if (user == null){
+                    System.out.println("\nNão encontramos seu login ou senha no nosso sistema! Tente novamente: ");
+                }
+            } while (user == null); // retorna null se não for nada => se for sai do => do While
+           
+
+            // pega a instancia de quem está logando
+            if (user instanceof usuarios.Cliente){
+                System.out.println("Bem vindo, " + login);
+            }
+            else if(user instanceof Funcionario){
+                System.out.println("Bem vindo, "+ login);
+            } 
 
             int opcao = 0;
             do {
@@ -61,7 +87,10 @@ public class Cliente {
                         objetoRemoto.apagarCarro(apagado);
                         break;
                     case 3:  // ok
-                        objetoRemoto.listarCarros();
+                        System.out.println("\nDigite 0 para listar por categoria ou digite 1 " +
+                        "para listar todos em ordem alfabética");
+                        int chaveListar = scanner.nextInt();
+                        objetoRemoto.listarCarros(chaveListar);
                         break;
                     case 4: //ok
                         System.out.println("\nDigite o nome ou o renavan do carro que deseja pesquisar:");
@@ -123,5 +152,6 @@ public class Cliente {
             System.err.println("Erro: " + e.getMessage());
             e.printStackTrace();
         }
+        
     }
 }

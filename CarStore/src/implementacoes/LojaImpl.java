@@ -1,4 +1,4 @@
-package imple;
+package implementacoes;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -7,32 +7,47 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import implementacoes.categorias.Economico;
+import implementacoes.categorias.Executivo;
+import implementacoes.categorias.Intermediario;
 import interfaces.Carro;
 import interfaces.Loja;
+import usuarios.Cliente;
+import usuarios.Funcionario;
+import usuarios.User;
 
 public class LojaImpl extends UnicastRemoteObject implements Loja {
 
     private List<CarroImpl> carros;
-    private List<ClienteImpl> clientes;
-    private List<FuncionarioImpl> funcionarios;
+    private static List<Cliente> clientes;
+    private static List<Funcionario> funcionarios;
 
     public LojaImpl() throws RemoteException {
         carros = new ArrayList<CarroImpl>();
-        clientes = new ArrayList<ClienteImpl>();
-        funcionarios = new ArrayList<FuncionarioImpl>();
+        clientes = new ArrayList<Cliente>();
+        funcionarios = new ArrayList<Funcionario>();
 
         // Adiciona 3 carros de cada tipo no início da execução
-        carros.add(new CarroImpl("Fiat Novo Uno", "988911891", "Econômico", 2020, 35000.0, false , 2));
-        carros.add(new CarroImpl("Chevrolet Onix", "987654321", "Econômico", 2019, 40000.0, false, 3));
-        carros.add(new CarroImpl("Ford Ka", "567891234", "Econômico", 2010, 22000.0, false, 1));
+        carros.add(new Economico("Fiat Novo Uno", "988911891", "Econômico", 2020, 35000.0, false , 2));
+        carros.add(new Economico("Chevrolet Onix", "987654321", "Econômico", 2019, 40000.0, false, 3));
+        carros.add(new Economico("Ford Ka", "567891234", "Econômico", 2010, 22000.0, false, 1));
 
-        carros.add(new CarroImpl("Ford Ka Sedan", "432156789", "Intermediário", 2020, 45000.0, false, 5));
-        carros.add(new CarroImpl("Chevrolet Onix Plus", "789123456", "Intermediário", 2019, 50000.0, false, 1));
-        carros.add(new CarroImpl("Hyundai HB20S", "345678912", "Intermediário", 2021, 68000.0, false, 2));
+        carros.add(new Intermediario("Ford Ka Sedan", "432156789", "Intermediário", 2020, 45000.0, false, 5));
+        carros.add(new Intermediario("Chevrolet Onix Plus", "789123456", "Intermediário", 2019, 50000.0, false, 1));
+        carros.add(new Intermediario("Hyundai HB20S", "345678912", "Intermediário", 2021, 68000.0, false, 2));
 
-        carros.add(new CarroImpl("Toyota Corolla", "456789123", "Executivo", 2023, 150000.0, false, 3));
-        carros.add(new CarroImpl("Honda Civic", "321654987", "Executivo", 2021, 185000.0, false, 2));
-        carros.add(new CarroImpl("Chevrolet Cruze", "987123654", "Executivo", 2019, 160000.0, false, 1));
+        carros.add(new Executivo("Toyota Corolla", "456789123", "Executivo", 2023, 150000.0, false, 3));
+        carros.add(new Executivo("Honda Civic", "321654987", "Executivo", 2021, 185000.0, false, 2));
+        carros.add(new Executivo("Chevrolet Cruze", "987123654", "Executivo", 2019, 160000.0, false, 1));
+    
+        // adiocina clientes 
+        clientes.add(new Cliente("Vitor", "12345"));
+        clientes.add(new Cliente("Paulo", "senha"));
+
+        // adiocina funcionarios 
+        funcionarios.add(new Funcionario("Pedro", "12345"));
+        funcionarios.add(new Funcionario("Joao", "senha"));
+        
     }
 
 
@@ -89,24 +104,47 @@ public class LojaImpl extends UnicastRemoteObject implements Loja {
      *  alfabética dos nomes.  
     */
     @Override
-    public void listarCarros() throws RemoteException { // de forma geral => ordem alfabetica dos nomes
-        System.out.println("Carros disponiveis em ordem alfabetica = \n-------------------------");
-        Collections.sort(carros, (c1, c2) -> { // collection para deixar em ordem alfabetica
-            try {
-                return c1.getNome().compareTo(c2.getNome());
-            } catch (RemoteException e) {
-                e.printStackTrace();
+    public void listarCarros(int chave) throws RemoteException { // de forma geral => ordem alfabetica dos nomes
+        
+        if(chave == 0){
+            System.out.println("Carros disponiveis por categoria = \n-------------------------");
+            Collections.sort(carros, (c1, c2) -> { // collection para deixar em ordem alfabetica
+                try {
+                    return c1.getCategoria().compareTo(c2.getCategoria());
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+                return 0;
+            });
+            for (Carro carro : carros) { // todos os atributos
+                System.out.println("Nome = " + carro.getNome() + ", Renavan = " + carro.getRenavan() + 
+                ", Categoria = " + carro.getCategoria() + ", Ano = " + carro.getAnoFabricacao() + 
+                ", Preço = " + carro.getPreco() + ", Quantidade disponível = " + carro.getQuantidadeDisponivel());
             }
-            return 0;
-        });
-        for (Carro carro : carros) { // todos os atributos
-            System.out.println("Nome = " + carro.getNome() + ", Renavan = " + carro.getRenavan() + 
-            ", Categoria = " + carro.getCategoria() + ", Ano = " + carro.getAnoFabricacao() + 
-            ", Preço = " + carro.getPreco() + ", Quantidade disponível = " + carro.getQuantidadeDisponivel());
+            System.out.println("-------------------------");
         }
-        System.out.println("-------------------------");
+        
+        if (chave == 1){
+            System.out.println("Carros disponiveis em ordem alfabetica = \n-------------------------");
+            Collections.sort(carros, (c1, c2) -> { // collection para deixar em ordem alfabetica
+                try {
+                    return c1.getNome().compareTo(c2.getNome());
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+                return 0;
+            });
+            for (Carro carro : carros) { // todos os atributos
+                System.out.println("Nome = " + carro.getNome() + ", Renavan = " + carro.getRenavan() + 
+                ", Categoria = " + carro.getCategoria() + ", Ano = " + carro.getAnoFabricacao() + 
+                ", Preço = " + carro.getPreco() + ", Quantidade disponível = " + carro.getQuantidadeDisponivel());
+            }
+        
+            System.out.println("-------------------------");
+        }
     }
 
+    
     /* 4.
      * Pesquisar (consultar) carro
      *  Um usuário pode realizar uma busca por
@@ -161,6 +199,7 @@ public class LojaImpl extends UnicastRemoteObject implements Loja {
      * Adicionar, apagar e alterar atributos de
      * carros são operações que fazem com que
      * o servidor tenha que atualizar os clientes
+     * * faz automaticamente
     */
 
     /* 7.
@@ -203,4 +242,28 @@ public class LojaImpl extends UnicastRemoteObject implements Loja {
         return true;
     }
 
+    @Override
+    // metodo autenticar 
+    public User autenticar(String login, String senha) throws RemoteException {
+        // Verifica se o login e a senha correspondem a um cliente
+        for (Cliente cliente : clientes) {
+            if (cliente.getLogin().equals(login) && cliente.getSenha().equals(senha)) {
+                System.out.println("Autenticação concluida, você é um cliente");
+                return cliente;
+            }
+        }
+    
+        // Verifica se o login e a senha correspondem a um funcionário
+        for (Funcionario funcionario : funcionarios) {
+            if (funcionario.getLogin().equals(login) && funcionario.getSenha().equals(senha)) {
+                System.out.println("Autenticação concluida, você é um funcionario");
+                return funcionario;
+            }
+        }
+    
+        // Caso não encontre nenhum usuário correspondente
+        System.out.println("Seu login ou senha não foi encontrado no nosso sistema");
+        return null;
+    }
+    
 }

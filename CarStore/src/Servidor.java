@@ -1,41 +1,27 @@
-import java.rmi.AlreadyBoundException;
-import java.rmi.Remote;
-import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
-import imple.CarroImpl;
-import imple.LojaImpl;
+import implementacoes.LojaImpl;
 import interfaces.Loja;
 
 public class Servidor {
-    
-    //CarroImpl carroObj = new CarroImpl(null, null, null, null, 0, 0, false, 0)
-
-    public Servidor() throws RemoteException {
-        LojaImpl lojaObjeto = new LojaImpl();
-
-    }
-
-    public static void main(String[] args) throws RemoteException, AlreadyBoundException {
-
+    public static void main(String args[]) {
         try {
-            Servidor refObjetoRemoto = new Servidor();
-
-            Loja skeleton = (Loja) UnicastRemoteObject.exportObject( (Remote) refObjetoRemoto, 0);
-
-            LocateRegistry.createRegistry( Registry.REGISTRY_PORT ); 
-
-            Registry registro = LocateRegistry.getRegistry();
-
-            registro.bind("Loja", skeleton);
-            System.err.println("Servidor pronto:");
-        
-        }catch (Exception e) {
+            LojaImpl refObjetoRemoto = new LojaImpl();
+            Loja stub = (Loja) UnicastRemoteObject.toStub(refObjetoRemoto);
+            if (stub == null) {
+                stub = (Loja) UnicastRemoteObject.exportObject(refObjetoRemoto, 0);
+            }
+            
+            LocateRegistry.createRegistry(20003); 
+            Registry registro = LocateRegistry.getRegistry(20003);
+            registro.bind("Loja", stub);
+            
+            System.out.println("Servidor pronto:");
+        } catch (Exception e) {
             System.err.println("Servidor: " + e.toString());
             e.printStackTrace();
         }
     }
-
 }
