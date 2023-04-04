@@ -1,9 +1,9 @@
-package teste2.imple;
+package imple;
 
 import java.io.Serializable;
 import java.rmi.RemoteException;
 
-import teste2.interfaces.Carro;
+import interfaces.Carro;
 
 public class CarroImpl implements Carro, Serializable {
     private String nome;

@@ -1,18 +1,16 @@
-package teste2;
-
 import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
-import teste2.imple.CarroImpl;
-import teste2.imple.ClienteImpl;
-import teste2.imple.FuncionarioImpl;
-import teste2.imple.LojaImpl;
-import teste2.interfaces.Carro;
-import teste2.interfaces.Cliente;
-import teste2.interfaces.Funcionario;
-import teste2.interfaces.Loja;
+import imple.CarroImpl;
+import imple.ClienteImpl;
+import imple.FuncionarioImpl;
+import imple.LojaImpl;
+import interfaces.Carro;
+import interfaces.Cliente;
+import interfaces.Funcionario;
+import interfaces.Loja;
 
 public class Servidor3 {
 

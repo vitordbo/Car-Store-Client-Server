@@ -1,4 +1,4 @@
-package teste2.imple;
+package imple;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import teste2.interfaces.Cliente;
+import interfaces.Cliente;
 
 public class ClienteImpl extends UnicastRemoteObject implements Cliente {
     private static final long serialVersionUID = 1L;

@@ -1,9 +1,9 @@
-package teste2.imple;
+package imple;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
-import teste2.interfaces.Funcionario;
+import interfaces.Funcionario;
 
 public class FuncionarioImpl extends ClienteImpl implements Funcionario {
     
@@ -17,9 +17,9 @@ public class FuncionarioImpl extends ClienteImpl implements Funcionario {
     }
 
     @Override
-    public void adicionarCarro(String nome, String renavan, String cor, String categoria, int ano,
+    public void adicionarCarro(String nome, String renavan, String categoria, int ano,
      double preco, boolean vendido, int quantidadeDisponivel) throws RemoteException {
-        CarroImpl novoCarro = new CarroImpl(nome, renavan, cor, categoria, ano, preco, vendido, quantidadeDisponivel);
+        CarroImpl novoCarro = new CarroImpl(nome, renavan, categoria, ano, preco, vendido, quantidadeDisponivel);
         estoque.add(novoCarro);
         System.out.println("Novo carro adicionado: " + novoCarro.getNome());
     }
@@ -36,13 +36,12 @@ public class FuncionarioImpl extends ClienteImpl implements Funcionario {
     }
 
     @Override
-    public void alterarCarro(String nome, String renavan, String cor, String categoria, int ano,
+    public void alterarCarro(String nome, String renavan, String categoria, int ano,
     double preco, boolean vendido, int quantidadeDisponivel) throws RemoteException {
         for (CarroImpl carro : estoque) {
             if (carro.getNome().equals(nome)) {
                 carro.setNome(nome);
                 carro.setRenavan(renavan);
-                carro.setCor(cor);
                 carro.setCategoria(categoria);
                 carro.setAno(ano);
                 carro.setPreco(preco);

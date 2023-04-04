@@ -1,9 +1,9 @@
-package teste2.interfaces;
+package interfaces;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-import teste2.imple.CarroImpl;
+import imple.CarroImpl;
 
 public interface Loja extends Remote {
     public void adicionarCarro(String renavan, String nome, String categoria, int ano, double preco) throws RemoteException;

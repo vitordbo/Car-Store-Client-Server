@@ -1,4 +1,4 @@
-package teste2.imple;
+package imple;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -7,8 +7,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import teste2.interfaces.Carro;
-import teste2.interfaces.Loja;
+import interfaces.Carro;
+import interfaces.Loja;
 
 public class LojaImpl extends UnicastRemoteObject implements Loja {
 

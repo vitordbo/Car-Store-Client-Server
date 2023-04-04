@@ -1,5 +1,3 @@
-package teste2;
-
 import java.rmi.AlreadyBoundException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -7,9 +5,9 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
-import teste2.imple.CarroImpl;
-import teste2.imple.LojaImpl;
-import teste2.interfaces.Loja;
+import imple.CarroImpl;
+import imple.LojaImpl;
+import interfaces.Loja;
 
 public class Servidor {
     

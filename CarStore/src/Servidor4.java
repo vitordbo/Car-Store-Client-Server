@@ -1,11 +1,9 @@
-package teste2;
-
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
-import teste2.imple.LojaImpl;
-import teste2.interfaces.Loja;
+import imple.LojaImpl;
+import interfaces.Loja;
 
 public class Servidor4 {
     public static void main(String args[]) {

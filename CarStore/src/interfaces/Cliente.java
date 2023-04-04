@@ -1,4 +1,4 @@
-package teste2.interfaces;
+package interfaces;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;

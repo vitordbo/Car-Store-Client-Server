@@ -1,10 +1,9 @@
-package teste2;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.Scanner;
 
-import teste2.imple.CarroImpl;
-import teste2.interfaces.Loja;
+import imple.CarroImpl;
+import interfaces.Loja;
 
 public class Cliente {
     public static void main(String[] args) {
