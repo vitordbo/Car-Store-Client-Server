@@ -1,48 +1,33 @@
 package implementacoes;
 
 import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Scanner;
 
-import implementacoes.categorias.Economico;
-import implementacoes.categorias.Executivo;
-import implementacoes.categorias.Intermediario;
 import interfaces.Carro;
 import interfaces.Loja;
 import usuarios.Cliente;
 import usuarios.Funcionario;
 import usuarios.User;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.Serializable;
 
 public class LojaImpl implements Loja, Serializable {
 
     private static final long serialVersionUID = 1L;
     private List<CarroImpl> carros;
-    private static List<Cliente> clientes;
-    private static List<Funcionario> funcionarios;
+    private static List<Cliente> clientes = new ArrayList<>();
+    private static List<Funcionario> funcionarios = new ArrayList<>();
+    private String arquivo;
 
-    public LojaImpl() throws RemoteException {
-        carros = new ArrayList<CarroImpl>();
-        clientes = new ArrayList<Cliente>();
-        funcionarios = new ArrayList<Funcionario>();
-
-        // Adiciona 3 carros de cada tipo no início da execução
-        carros.add(new Economico("Fiat Novo Uno", "988911891", "Econômico", 2020, 35000.0, false , 1));
-        carros.add(new Economico("Chevrolet Onix", "987654321", "Econômico", 2019, 40000.0, false, 1));
-        carros.add(new Economico("Ford Ka", "567891234", "Econômico", 2010, 22000.0, false, 2));
-
-        carros.add(new Intermediario("Ford Ka Sedan", "432156789", "Intermediário", 2020, 45000.0, false, 1));
-        carros.add(new Intermediario("Chevrolet Onix Plus", "789123456", "Intermediário", 2019, 50000.0, false, 1));
-        carros.add(new Intermediario("Hyundai HB20S", "345678912", "Intermediário", 2021, 68000.0, false, 2));
-
-        carros.add(new Executivo("Toyota Corolla", "456789123", "Executivo", 2023, 150000.0, false, 2));
-        carros.add(new Executivo("Honda Civic", "321654987", "Executivo", 2021, 185000.0, false, 1));
-        carros.add(new Executivo("Chevrolet Cruze", "987123654", "Executivo", 2019, 160000.0, false, 1));
-    
+    public LojaImpl(String arquivo){ // passa o arquivo la no servidor
         // adiocina clientes 
         clientes.add(new Cliente("Vitor", "12345"));
         clientes.add(new Cliente("Paulo", "senha"));
@@ -51,6 +36,55 @@ public class LojaImpl implements Loja, Serializable {
         funcionarios.add(new Funcionario("Pedro", "12345"));
         funcionarios.add(new Funcionario("Joao", "senha"));
         
+        this.arquivo = arquivo;
+        carros = new ArrayList<CarroImpl>();
+        lerCarrosDoArquivo();
+    }
+
+    private void lerCarrosDoArquivo(){
+        try {
+            File arquivoCarros = new File(arquivo);
+            Scanner leitor = new Scanner(arquivoCarros);
+            while (leitor.hasNextLine()){
+                String linha = leitor.nextLine();
+                String[] campos = linha.split(",");
+                String nome = campos[0];
+                String renavan = campos[1];
+                String categoria = campos[2];
+                int ano = Integer.parseInt(campos[3]);
+                double preco = Double.parseDouble(campos[4]);
+                boolean disponivel = Boolean.parseBoolean(campos[5]);
+                int quantidade = Integer.parseInt(campos[6]);
+                CarroImpl carro = new CarroImpl(nome, renavan, categoria, ano, preco, disponivel, quantidade);
+                carros.add(carro);
+            }
+            leitor.close();
+        } catch (Exception e) {
+            System.out.println("Erro ao ler arquivo");
+        }
+    }
+
+    @Override
+    public void escreverCarrosEmArquivo(String nomeArquivo) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(nomeArquivo))) {
+            for (Carro carro : carros) {
+                writer.write(carro.toString());
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            System.err.println("Erro ao escrever carros no arquivo: " + e.getMessage());
+        }
+    }
+    
+
+    public LojaImpl() throws RemoteException { // posso passar pro outro construtor
+        // adiocina clientes 
+        clientes.add(new Cliente("Vitor", "12345"));
+        clientes.add(new Cliente("Paulo", "senha"));
+
+        // adiocina funcionarios 
+        funcionarios.add(new Funcionario("Pedro", "12345"));
+        funcionarios.add(new Funcionario("Joao", "senha"));
     }
 
 
@@ -62,7 +96,7 @@ public class LojaImpl implements Loja, Serializable {
      *  renavan, nome, categoria, ano de
      *  fabricação e preço. 
      *  Atualizar quantidade disponível.
-    */ 
+    */
     @Override // ok pro funcionario 
     public CarroImpl adicionarCarro(String renavan, String nome, String categoria, int ano, double preco) throws RemoteException {
         CarroImpl novoCarro = new CarroImpl(nome, renavan, categoria, ano, preco, false, 1);
@@ -81,7 +115,7 @@ public class LojaImpl implements Loja, Serializable {
      *  removidos a partir do nome do carro ou
      *  quando a quantidade disponível chegar
      *  em zero. 
-    */  
+    */    
     @Override // ok so para funcionario
     public CarroImpl apagarCarro(String nomeCarro) throws RemoteException {
         Iterator<CarroImpl> iter = carros.iterator(); // Iterator para não dar erro
@@ -107,10 +141,10 @@ public class LojaImpl implements Loja, Serializable {
      *  ocorrer por categoria ou de forma geral e
      *  deve ser apresentada em ordem
      *  alfabética dos nomes.  
-    */  
+    */
     @Override // ok para func e cliente
     public List<Carro> listarCarros(int chave) throws RemoteException { // de forma geral => ordem alfabetica dos nomes
-        List<Carro> carrosRetorno = new ArrayList<Carro>();
+        List<Carro> carrosRetorno = new ArrayList<>();
         if(chave == 0){
             System.out.println("Carros disponiveis por categoria = \n-------------------------");
             Collections.sort(carros, (c1, c2) -> { // collection para deixar em ordem alfabetica
@@ -159,7 +193,7 @@ public class LojaImpl implements Loja, Serializable {
      * Pesquisar (consultar) carro
      *  Um usuário pode realizar uma busca por
      *  carro a partir de seu nome ou do renavan.
-    */ // ok para cliente e funcionario
+    */
     @Override
     public CarroImpl pesquisarCarro(String chave) throws RemoteException { // nome ou Renavam
         for (CarroImpl carro : this.carros) {
@@ -183,7 +217,7 @@ public class LojaImpl implements Loja, Serializable {
      * cadastro pode ter sido feito de forma
      * errada (nome ou data de fabricação
      * incorretos, etc).
-    */ // ok so para funcionarios 
+    */
     @Override 
     public CarroImpl alterarAtributos(String chave, String renavanAlte, String nomeAlte, String categoriaAlte, int anoAlte, double precoAlte, int qauntAlte) throws RemoteException { 
         for (CarroImpl carro : this.carros) {
@@ -204,6 +238,7 @@ public class LojaImpl implements Loja, Serializable {
     }
 
 
+
     /* 6.
      * Atualizar listagem de carros enviada aos clientes conectados
      * Adicionar, apagar e alterar atributos de
@@ -217,7 +252,7 @@ public class LojaImpl implements Loja, Serializable {
      * Um usuário pode consultar o sistema
      * para saber quantos carros estão
      * armazenados em um dado momento. 
-    */ // ok par cliente e funcionario 
+    */
     @Override
     public int exibirQuantidadeCarros() throws RemoteException {
         int quantidadeTotal = 0;

@@ -16,7 +16,6 @@ public interface Carro extends Remote {
     public void setCategoria(String categoria) throws RemoteException;
     public void setAno(int ano) throws RemoteException;
     public void setPreco(double preco) throws RemoteException;
-    public void setVendido(boolean vendido) throws RemoteException;
     public void setQuantidadeDisponivel(int quantidadeDisponivel) throws RemoteException;
 
 }

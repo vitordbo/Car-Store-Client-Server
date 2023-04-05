@@ -1,17 +1,17 @@
+package servidor;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
 import implementacoes.LojaImpl;
-import implementacoes.LojaImplTeste;
 import interfaces.Loja;
 
-public class ServidorTeste {
+public class Servidor {
     public static void main(String args[]) {
  
         try {
             //criar objeto servidor
-            LojaImplTeste refObjetoRemoto = new LojaImplTeste("D:/Users/vitor/git/Car-Store-Client-Server/CarStore/src/carros.txt");
+            LojaImpl refObjetoRemoto = new LojaImpl("D:/Users/vitor/git/Car-Store-Client-Server/CarStore/src/carros.txt");
             
             Loja skeleton = (Loja) UnicastRemoteObject.exportObject(refObjetoRemoto, 0);
 

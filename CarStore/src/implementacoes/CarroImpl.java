@@ -11,7 +11,6 @@ public class CarroImpl implements Carro, Serializable {
    private String categoria;
    private int ano;
    private double preco;
-   private boolean vendido;
    private int quantidadeDisponivel;
 
    public CarroImpl(){
@@ -25,7 +24,6 @@ public class CarroImpl implements Carro, Serializable {
       this.categoria = categoria;
       this.ano = ano;
       this.preco = preco;
-      this.vendido = false;
       this.quantidadeDisponivel = quantidadeDisponivel;
    }
 
@@ -94,11 +92,6 @@ public class CarroImpl implements Carro, Serializable {
    @Override
    public void setPreco(double preco) throws RemoteException {
       this.preco = preco;
-   }
-
-   @Override
-   public void setVendido(boolean vendido) throws RemoteException {
-      this.vendido = vendido;
    }
 
    @Override
