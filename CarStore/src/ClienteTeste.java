@@ -101,6 +101,7 @@ public class ClienteTeste {
                             }
                             break;
                         case 0:
+                            objetoRemoto.escreverCarrosEmArquivo("novosCarros.txt");
                             System.out.println("\nObrigado por utilizar a loja de carros!");
                             break;
                         default:
@@ -238,6 +239,7 @@ public class ClienteTeste {
                             }
                             break;
                         case 0:
+                            objetoRemoto.escreverCarrosEmArquivo("novosCarros.txt");
                             System.out.println("\nObrigado por utilizar a loja de carros!");
                             break;
                         default:
