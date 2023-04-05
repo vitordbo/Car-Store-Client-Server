@@ -62,8 +62,8 @@ public class LojaImpl implements Loja, Serializable {
      *  renavan, nome, categoria, ano de
      *  fabricação e preço. 
      *  Atualizar quantidade disponível.
-    */ // so para funcionario
-    @Override // ok pro cliente 
+    */ 
+    @Override // ok pro funcionario 
     public CarroImpl adicionarCarro(String renavan, String nome, String categoria, int ano, double preco) throws RemoteException {
         CarroImpl novoCarro = new CarroImpl(nome, renavan, categoria, ano, preco, false, 1);
         carros.add(novoCarro);
@@ -81,8 +81,8 @@ public class LojaImpl implements Loja, Serializable {
      *  removidos a partir do nome do carro ou
      *  quando a quantidade disponível chegar
      *  em zero. 
-    */    // ok pro cliente
-    @Override // so para funcionario
+    */  
+    @Override // ok so para funcionario
     public CarroImpl apagarCarro(String nomeCarro) throws RemoteException {
         Iterator<CarroImpl> iter = carros.iterator(); // Iterator para não dar erro
         while (iter.hasNext()) {
@@ -107,7 +107,7 @@ public class LojaImpl implements Loja, Serializable {
      *  ocorrer por categoria ou de forma geral e
      *  deve ser apresentada em ordem
      *  alfabética dos nomes.  
-    */ // funcionario e cliente 
+    */  
     @Override // ok para func e cliente
     public List<Carro> listarCarros(int chave) throws RemoteException { // de forma geral => ordem alfabetica dos nomes
         List<Carro> carrosRetorno = new ArrayList<Carro>();
@@ -183,7 +183,7 @@ public class LojaImpl implements Loja, Serializable {
      * cadastro pode ter sido feito de forma
      * errada (nome ou data de fabricação
      * incorretos, etc).
-    */
+    */ // ok so para funcionarios 
     @Override 
     public CarroImpl alterarAtributos(String chave, String renavanAlte, String nomeAlte, String categoriaAlte, int anoAlte, double precoAlte, int qauntAlte) throws RemoteException { 
         for (CarroImpl carro : this.carros) {
@@ -217,7 +217,7 @@ public class LojaImpl implements Loja, Serializable {
      * Um usuário pode consultar o sistema
      * para saber quantos carros estão
      * armazenados em um dado momento. 
-    */
+    */ // ok par cliente e funcionario 
     @Override
     public int exibirQuantidadeCarros() throws RemoteException {
         int quantidadeTotal = 0;
@@ -234,7 +234,7 @@ public class LojaImpl implements Loja, Serializable {
      * Um usuário pode efetuar a compra de um
      * carro após consulta e análise de preço. 
     */
-    @Override
+    @Override // ok para funcionario e cliente
     public boolean comprarCarro(String nomeCarro) throws RemoteException {
         Carro carro = null;
         for (Carro c : carros) {
@@ -243,11 +243,13 @@ public class LojaImpl implements Loja, Serializable {
                 break;
             }
         }
+       
         if (carro == null) {
             System.out.println("Carro não encontrado na loja");
             return false; // carro não encontrado na loja
         }
         carro.setQuantidadeDisponivel(carro.getQuantidadeDisponivel() - 1); // diminui 1 da quant disponivel
+        
         if (carro.getQuantidadeDisponivel() == 0) { // se diminuir 1 e ficar com 0 => remove da lista  
             carros.remove(carro); //=> se ficar maior que 0 => nao remove, só diminui
             System.out.println("Carro removido: " + carro.getNome());

@@ -87,12 +87,18 @@ public class Cliente {
                             }
                             break;
                         case 3: 
-                            objetoRemoto.exibirQuantidadeCarros();
+                            int quant = objetoRemoto.exibirQuantidadeCarros();
+                            System.out.println("Quantidade de carros disponívies = " + quant);
                             break;
                         case 4:
                             System.out.println("\nDigite o nome do carro que deseja comprar:");
                             String nomeCarro = System.console().readLine();
-                            objetoRemoto.comprarCarro(nomeCarro);
+                            boolean comprado = objetoRemoto.comprarCarro(nomeCarro);
+                            if(comprado == true){
+                                System.out.println("Carro " + nomeCarro + " comprado com sucesso, Parabéns!");
+                            }else{
+                                System.out.println("Carro " + nomeCarro + " não encontrado no nosso sistema!");
+                            }
                             break;
                         case 0:
                             System.out.println("\nObrigado por utilizar a loja de carros!");
@@ -182,7 +188,7 @@ public class Cliente {
                                 System.out.println("\nCarro não encontrado"); // imprimindo pro cliente 
                             }
                             break;
-                        case 5:
+                        case 5: // retorno ok
                             System.out.println("\nDigite o nome ou o renavan do carro que deseja pesquisar:");
                             String chaveAlterar = System.console().readLine();
                             CarroImpl carroAletarado = objetoRemoto.pesquisarCarro(chaveAlterar);
@@ -209,19 +215,27 @@ public class Cliente {
                                 System.out.println("\nDigite a nova quantidade disponivel:");
                                 int qauntAlte = scanner.nextInt();
 
-                                objetoRemoto.alterarAtributos(chaveAlterar, renavanAlte, nomeAlte, categoriaAlte,anoAlte, precoAlte, qauntAlte);
+                               CarroImpl carroAlterReturn = objetoRemoto.alterarAtributos(chaveAlterar, renavanAlte, nomeAlte, categoriaAlte,anoAlte, precoAlte, qauntAlte);
+                               System.out.println("\nCarro alterado = " + carroAlterReturn.toString()); // imprimindo pro cliente 
                             }
                             else {
                                 System.out.println("Carro pesquisado não encontrado");
                             }
                         break;
                         case 6:
-                            objetoRemoto.exibirQuantidadeCarros();
+                            int quant = objetoRemoto.exibirQuantidadeCarros();
+                            System.out.println("Quantidade de carros disponívies = " + quant);
                             break;
                         case 7:
                             System.out.println("\nDigite o nome do carro que deseja comprar:");
                             String nomeCarro = System.console().readLine();
-                            objetoRemoto.comprarCarro(nomeCarro);
+                            boolean comprado = objetoRemoto.comprarCarro(nomeCarro);
+                           
+                            if(comprado == true){
+                                System.out.println("Carro " + nomeCarro + " comprado com sucesso, Parabéns!");
+                            }else{
+                                System.out.println("Carro " + nomeCarro + " não encontrado no nosso sistema!");
+                            }
                             break;
                         case 0:
                             System.out.println("\nObrigado por utilizar a loja de carros!");
