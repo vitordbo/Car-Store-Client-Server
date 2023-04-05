@@ -23,11 +23,19 @@ public class LojaImplTeste implements Loja, Serializable {
 
     private static final long serialVersionUID = 1L;
     private List<CarroImpl> carros;
-    private static List<Cliente> clientes;
-    private static List<Funcionario> funcionarios;
+    private static List<Cliente> clientes = new ArrayList<>();
+    private static List<Funcionario> funcionarios = new ArrayList<>();
     private String arquivo;
 
     public LojaImplTeste(String arquivo){ // passa o arquivo la no servidor
+        // adiocina clientes 
+        clientes.add(new Cliente("Vitor", "12345"));
+        clientes.add(new Cliente("Paulo", "senha"));
+
+        // adiocina funcionarios 
+        funcionarios.add(new Funcionario("Pedro", "12345"));
+        funcionarios.add(new Funcionario("Joao", "senha"));
+        
         this.arquivo = arquivo;
         carros = new ArrayList<CarroImpl>();
         lerCarrosDoArquivo();
@@ -136,7 +144,7 @@ public class LojaImplTeste implements Loja, Serializable {
     */
     @Override // ok para func e cliente
     public List<Carro> listarCarros(int chave) throws RemoteException { // de forma geral => ordem alfabetica dos nomes
-        List<Carro> carrosRetorno = new ArrayList<Carro>();
+        List<Carro> carrosRetorno = new ArrayList<>();
         if(chave == 0){
             System.out.println("Carros disponiveis por categoria = \n-------------------------");
             Collections.sort(carros, (c1, c2) -> { // collection para deixar em ordem alfabetica

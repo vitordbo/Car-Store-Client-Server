@@ -88,7 +88,7 @@ public class ClienteTeste {
                             break;
                         case 3: 
                             int quant = objetoRemoto.exibirQuantidadeCarros();
-                            System.out.println("Quantidade de carros disponívies = " + quant);
+                            System.out.println("\nQuantidade de carros disponívies = " + quant);
                             break;
                         case 4:
                             System.out.println("\nDigite o nome do carro que deseja comprar:");
@@ -101,7 +101,7 @@ public class ClienteTeste {
                             }
                             break;
                         case 0:
-                            objetoRemoto.escreverCarrosEmArquivo("novosCarros.txt");
+                            objetoRemoto.escreverCarrosEmArquivo("D:/Users/vitor/git/Car-Store-Client-Server/CarStore/src/novosCarros.txt");
                             System.out.println("\nObrigado por utilizar a loja de carros!");
                             break;
                         default:
@@ -225,7 +225,7 @@ public class ClienteTeste {
                         break;
                         case 6:
                             int quant = objetoRemoto.exibirQuantidadeCarros();
-                            System.out.println("Quantidade de carros disponívies = " + quant);
+                            System.out.println("\nQuantidade de carros disponívies = " + quant);
                             break;
                         case 7:
                             System.out.println("\nDigite o nome do carro que deseja comprar:");
@@ -239,8 +239,8 @@ public class ClienteTeste {
                             }
                             break;
                         case 0:
-                            objetoRemoto.escreverCarrosEmArquivo("novosCarros.txt");
-                            System.out.println("\nObrigado por utilizar a loja de carros!");
+                        objetoRemoto.escreverCarrosEmArquivo("D:/Users/vitor/git/Car-Store-Client-Server/CarStore/src/novosCarros.txt");
+                        System.out.println("\nObrigado por utilizar a loja de carros!");
                             break;
                         default:
                             System.out.println("\nOpção inválida. Tente novamente.");

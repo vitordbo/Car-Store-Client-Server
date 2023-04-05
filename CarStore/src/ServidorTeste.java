@@ -11,7 +11,7 @@ public class ServidorTeste {
  
         try {
             //criar objeto servidor
-            LojaImplTeste refObjetoRemoto = new LojaImplTeste("carros.txt");
+            LojaImplTeste refObjetoRemoto = new LojaImplTeste("D:/Users/vitor/git/Car-Store-Client-Server/CarStore/src/carros.txt");
             
             Loja skeleton = (Loja) UnicastRemoteObject.exportObject(refObjetoRemoto, 0);
 
