@@ -6,20 +6,23 @@ import implementacoes.LojaImpl;
 import interfaces.Loja;
 
 public class Servidor {
-    public static void main(String[] args) {
-
+    public static void main(String args[]) {
+ 
         try {
+            //criar objeto servidor
+            LojaImpl refObjetoRemoto = new LojaImpl();
             
-            LojaImpl object = new LojaImpl();
+            Loja skeleton = (Loja) UnicastRemoteObject.exportObject(refObjetoRemoto, 0);
 
-            Loja sketleton = (Loja) UnicastRemoteObject.exportObject(object, 0);
+            LocateRegistry.createRegistry(20003); 
+            
+            Registry registro = LocateRegistry.getRegistry(20003);
+            
+            /* O método bind é então chamado no stub do registro para vincular
+            * o stub do objeto remoto ao nome "Hello" no registro.*/
+            registro.bind("Loja", skeleton);
+            System.err.println("Servidor pronto:");
 
-            LocateRegistry.createRegistry(20002);
-
-            Registry resgistry = LocateRegistry.getRegistry(20002);
-            resgistry.rebind("Loja", sketleton);
-
-            System.out.println("Server Init");
         } catch (Exception e) {
             System.err.println("Servidor: " + e.toString());
             e.printStackTrace();

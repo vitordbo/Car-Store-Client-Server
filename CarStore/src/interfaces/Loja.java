@@ -2,14 +2,15 @@ package interfaces;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.List;
 
 import implementacoes.CarroImpl;
 import usuarios.User;
 
 public interface Loja extends Remote {
-    public void adicionarCarro(String renavan, String nome, String categoria, int ano, double preco) throws RemoteException;
-    public void apagarCarro(String nomeCarro) throws RemoteException;
-    public void listarCarros(int chave) throws RemoteException;
+    public CarroImpl adicionarCarro(String renavan, String nome, String categoria, int ano, double preco) throws RemoteException;
+    public CarroImpl apagarCarro(String nomeCarro) throws RemoteException;
+    public List<Carro> listarCarros(int chave) throws RemoteException;
     public CarroImpl pesquisarCarro(String chave) throws RemoteException;
     public CarroImpl alterarAtributos(String chave, String renavanAlte, String nomeAlte, String categoriaAlte, int anoAlte, double precoAlte, int qauntAlte) throws RemoteException;
 

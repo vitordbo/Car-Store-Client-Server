@@ -1,8 +1,11 @@
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import implementacoes.CarroImpl;
+import interfaces.Carro;
 import interfaces.Loja;
 import usuarios.Funcionario;
 import usuarios.User;
@@ -56,18 +59,34 @@ public class Cliente {
     
                     Scanner scanner = new Scanner(System.in);
                     switch(opcao) {
-                        case 1:  // ok
+                        case 1:  //ok retorno
                             System.out.println("\nDigite 0 para listar por categoria ou digite 1 " +
                             "para listar todos em ordem alfabética");
                             int chaveListar = scanner.nextInt();
-                            objetoRemoto.listarCarros(chaveListar);
+                            
+                            List<Carro> listaRetornadaCliente = new ArrayList<>();
+                            listaRetornadaCliente = objetoRemoto.listarCarros(chaveListar);
+                            System.out.println("");
+
+                            for (Carro carro : listaRetornadaCliente) { // todos os atributos
+                                System.out.println("Nome = " + carro.getNome() + ", Renavan = " + carro.getRenavan() + 
+                                ", Categoria = " + carro.getCategoria() + ", Ano = " + carro.getAnoFabricacao() + 
+                                ", Preço = " + carro.getPreco() + ", Quantidade disponível = " + carro.getQuantidadeDisponivel());
+                            }
                             break;
-                        case 2: //ok
+                        case 2: //ok retorno
                             System.out.println("\nDigite o nome ou o renavan do carro que deseja pesquisar:");
                             String chave = System.console().readLine();
-                            objetoRemoto.pesquisarCarro(chave);
+                            CarroImpl carroPesquisadoCliente = objetoRemoto.pesquisarCarro(chave);
+
+                            // testa se foi achadp mesmo => se não foi retorna null
+                            if (carroPesquisadoCliente instanceof CarroImpl){
+                                System.out.println("\nCarro achado = " + carroPesquisadoCliente.toString()); // imprimindo pro cliente 
+                            }else{
+                                System.out.println("\nCarro não encontrado"); // imprimindo pro cliente 
+                            }
                             break;
-                        case 3:
+                        case 3: 
                             objetoRemoto.exibirQuantidadeCarros();
                             break;
                         case 4:
@@ -105,7 +124,7 @@ public class Cliente {
 
                     Scanner scanner = new Scanner(System.in);
                     switch(opcao) {
-                        case 1: // adicionar carro => ok
+                        case 1: //ok retorno
                             System.out.println("\nDigite o renavan do carro que deseja adicionar:");
                             String renavan = System.console().readLine();
 
@@ -121,23 +140,47 @@ public class Cliente {
                             System.out.println("\nDigite o preço do carro que deseja adicionar:");
                             double preco = scanner.nextDouble();
 
-                            objetoRemoto.adicionarCarro(renavan, nome, categoria, ano, preco);
+                            CarroImpl carroAdicionado =  objetoRemoto.adicionarCarro(renavan, nome, categoria, ano, preco);
+                            System.out.println("\nCarro adicionado = " + carroAdicionado.toString()); // imprimindo pro cliente 
                             break;
-                        case 2: // ok
+                        case 2: //ok retorno
                             System.out.println("\nDigite o nome do carro que deseja apagar:");
                             String apagado = System.console().readLine();
-                            objetoRemoto.apagarCarro(apagado);
+                            CarroImpl carroRemovido = objetoRemoto.apagarCarro(apagado);
+
+                            // testa se foi removido mesmo => se não foi retorna null
+                            if (carroRemovido instanceof CarroImpl){
+                                System.out.println("\nCarro removido = " + carroRemovido.toString()); // imprimindo pro cliente 
+                            }else{
+                                System.out.println("\nCarro não encontrado/removido"); // imprimindo pro cliente 
+                            }
                             break;
-                        case 3:  // ok
+                        case 3:  //ok retorno
                             System.out.println("\nDigite 0 para listar por categoria ou digite 1 " +
                             "para listar todos em ordem alfabética");
+                            
                             int chaveListar = scanner.nextInt();
-                            objetoRemoto.listarCarros(chaveListar);
+                            List<Carro> listaRetornada = new ArrayList<>();
+                            listaRetornada = objetoRemoto.listarCarros(chaveListar);
+                            System.out.println("");
+
+                            for (Carro carro : listaRetornada) { // todos os atributos
+                                System.out.println("Nome = " + carro.getNome() + ", Renavan = " + carro.getRenavan() + 
+                                ", Categoria = " + carro.getCategoria() + ", Ano = " + carro.getAnoFabricacao() + 
+                                ", Preço = " + carro.getPreco() + ", Quantidade disponível = " + carro.getQuantidadeDisponivel());
+                            }
                             break;
-                        case 4: //ok
+                        case 4: //ok retorno
                             System.out.println("\nDigite o nome ou o renavan do carro que deseja pesquisar:");
                             String chave = System.console().readLine();
-                            objetoRemoto.pesquisarCarro(chave);
+                            CarroImpl carroPesquisadoFuncionario = objetoRemoto.pesquisarCarro(chave);
+
+                            // testa se foi achadp mesmo => se não foi retorna null
+                            if (carroPesquisadoFuncionario instanceof CarroImpl){
+                                System.out.println("\nCarro achado = " + carroPesquisadoFuncionario.toString()); // imprimindo pro cliente 
+                            }else{
+                                System.out.println("\nCarro não encontrado"); // imprimindo pro cliente 
+                            }
                             break;
                         case 5:
                             System.out.println("\nDigite o nome ou o renavan do carro que deseja pesquisar:");
