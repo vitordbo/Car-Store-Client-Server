@@ -1,0 +1,9 @@
+Fiat Novo Uno, 988911898, Econômico, 2020, 35000.0, false , 1
+Chevrolet Onix, 987654321, Econômico, 2019, 40000.0, false, 1
+Ford Ka, 567891234, Econômico, 2010, 22000.0, false, 2
+Ford Ka Sedan, 432156789, Intermediário, 2020, 45000.0, false, 1
+Chevrolet Onix Plus, 789123456, Intermediário, 2019, 50000.0, false, 1
+Hyundai HB20S, 345678912, Intermediário, 2021, 68000.0, false, 2
+Toyota Corolla, 456789123, Executivo, 2023, 150000.0, false, 2
+Honda Civic, 321654987, Executivo, 2021, 185000.0, false, 1
+Chevrolet Cruze, 987123654, Executivo, 2019, 160000.0, false, 1

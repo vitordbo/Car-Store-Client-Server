@@ -1,23 +1,22 @@
 package implementacoes;
 
 import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
-import implementacoes.categorias.Economico;
-import implementacoes.categorias.Executivo;
-import implementacoes.categorias.Intermediario;
 import interfaces.Carro;
 import interfaces.Loja;
 import usuarios.Cliente;
 import usuarios.Funcionario;
 import usuarios.User;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.Serializable;
 
 public class LojaImplTeste implements Loja, Serializable {
@@ -57,6 +56,19 @@ public class LojaImplTeste implements Loja, Serializable {
         }
     }
 
+    @Override
+    public void escreverCarrosEmArquivo(String nomeArquivo) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(nomeArquivo))) {
+            for (Carro carro : carros) {
+                writer.write(carro.toString());
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            System.err.println("Erro ao escrever carros no arquivo: " + e.getMessage());
+        }
+    }
+    
+
     public LojaImplTeste() throws RemoteException { // posso passar pro outro construtor
         // adiocina clientes 
         clientes.add(new Cliente("Vitor", "12345"));
@@ -65,7 +77,6 @@ public class LojaImplTeste implements Loja, Serializable {
         // adiocina funcionarios 
         funcionarios.add(new Funcionario("Pedro", "12345"));
         funcionarios.add(new Funcionario("Joao", "senha"));
-        
     }
 
 
@@ -78,13 +89,14 @@ public class LojaImplTeste implements Loja, Serializable {
      *  fabricação e preço. 
      *  Atualizar quantidade disponível.
     */
-    @Override
-    public void adicionarCarro(String renavan, String nome, String categoria, int ano, double preco) throws RemoteException {
+    @Override // ok pro funcionario 
+    public CarroImpl adicionarCarro(String renavan, String nome, String categoria, int ano, double preco) throws RemoteException {
         CarroImpl novoCarro = new CarroImpl(nome, renavan, categoria, ano, preco, false, 1);
         carros.add(novoCarro);
-        escreve
+        
         System.out.println("\nCarro adicionado: " + novoCarro.getNome());
         exibirQuantidadeCarros();
+        return novoCarro;
     }
 
 
@@ -96,8 +108,8 @@ public class LojaImplTeste implements Loja, Serializable {
      *  quando a quantidade disponível chegar
      *  em zero. 
     */    
-    @Override
-    public void apagarCarro(String nomeCarro) throws RemoteException {
+    @Override // ok so para funcionario
+    public CarroImpl apagarCarro(String nomeCarro) throws RemoteException {
         Iterator<CarroImpl> iter = carros.iterator(); // Iterator para não dar erro
         while (iter.hasNext()) {
             CarroImpl carro = iter.next();
@@ -105,11 +117,12 @@ public class LojaImplTeste implements Loja, Serializable {
                 iter.remove();
                 System.out.println("Carro removido: " + nomeCarro);
                 exibirQuantidadeCarros();
-                return;
+                return carro;
             }
         }
         System.out.println("\nNão foi encontrado nenhum carro com o nome " + nomeCarro + ".");
         System.out.println("-------------------------");
+        return null;
     }
     
 
@@ -121,9 +134,9 @@ public class LojaImplTeste implements Loja, Serializable {
      *  deve ser apresentada em ordem
      *  alfabética dos nomes.  
     */
-    @Override
-    public void listarCarros(int chave) throws RemoteException { // de forma geral => ordem alfabetica dos nomes
-        
+    @Override // ok para func e cliente
+    public List<Carro> listarCarros(int chave) throws RemoteException { // de forma geral => ordem alfabetica dos nomes
+        List<Carro> carrosRetorno = new ArrayList<Carro>();
         if(chave == 0){
             System.out.println("Carros disponiveis por categoria = \n-------------------------");
             Collections.sort(carros, (c1, c2) -> { // collection para deixar em ordem alfabetica
@@ -135,11 +148,13 @@ public class LojaImplTeste implements Loja, Serializable {
                 return 0;
             });
             for (Carro carro : carros) { // todos os atributos
+                carrosRetorno.add(carro);
                 System.out.println("Nome = " + carro.getNome() + ", Renavan = " + carro.getRenavan() + 
                 ", Categoria = " + carro.getCategoria() + ", Ano = " + carro.getAnoFabricacao() + 
                 ", Preço = " + carro.getPreco() + ", Quantidade disponível = " + carro.getQuantidadeDisponivel());
             }
             System.out.println("-------------------------");
+            return carrosRetorno;
         }
         
         if (chave == 1){
@@ -153,13 +168,16 @@ public class LojaImplTeste implements Loja, Serializable {
                 return 0;
             });
             for (Carro carro : carros) { // todos os atributos
+                carrosRetorno.add(carro);
                 System.out.println("Nome = " + carro.getNome() + ", Renavan = " + carro.getRenavan() + 
                 ", Categoria = " + carro.getCategoria() + ", Ano = " + carro.getAnoFabricacao() + 
                 ", Preço = " + carro.getPreco() + ", Quantidade disponível = " + carro.getQuantidadeDisponivel());
             }
-        
+
             System.out.println("-------------------------");
+            return carrosRetorno;
         }
+        return null; // caso de erro 
     }
 
     
@@ -212,6 +230,7 @@ public class LojaImplTeste implements Loja, Serializable {
     }
 
 
+
     /* 6.
      * Atualizar listagem de carros enviada aos clientes conectados
      * Adicionar, apagar e alterar atributos de
@@ -228,16 +247,21 @@ public class LojaImplTeste implements Loja, Serializable {
     */
     @Override
     public int exibirQuantidadeCarros() throws RemoteException {
-        System.out.println("Quantidade de carros = " + carros.size());
+        int quantidadeTotal = 0;
+
+        for (CarroImpl carro : carros){
+            quantidadeTotal += carro.getQuantidadeDisponivel();
+        }
+        System.out.println("Quantidade de carros disponívies = " + quantidadeTotal);
         System.out.println("-------------------------");
-        return carros.size();
+        return quantidadeTotal;
     }
 
     /* 8.
      * Um usuário pode efetuar a compra de um
      * carro após consulta e análise de preço. 
     */
-    @Override
+    @Override // ok para funcionario e cliente
     public boolean comprarCarro(String nomeCarro) throws RemoteException {
         Carro carro = null;
         for (Carro c : carros) {
@@ -246,11 +270,13 @@ public class LojaImplTeste implements Loja, Serializable {
                 break;
             }
         }
+       
         if (carro == null) {
             System.out.println("Carro não encontrado na loja");
             return false; // carro não encontrado na loja
         }
         carro.setQuantidadeDisponivel(carro.getQuantidadeDisponivel() - 1); // diminui 1 da quant disponivel
+        
         if (carro.getQuantidadeDisponivel() == 0) { // se diminuir 1 e ficar com 0 => remove da lista  
             carros.remove(carro); //=> se ficar maior que 0 => nao remove, só diminui
             System.out.println("Carro removido: " + carro.getNome());
