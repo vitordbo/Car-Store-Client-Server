@@ -1,2 +1,1 @@
-metodo 5 => 
-continuar desde alterar atributos colocando o retorno para o cliente 
+alterar carros e quantidades

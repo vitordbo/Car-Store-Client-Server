@@ -31,16 +31,16 @@ public class LojaImpl implements Loja, Serializable {
         funcionarios = new ArrayList<Funcionario>();
 
         // Adiciona 3 carros de cada tipo no início da execução
-        carros.add(new Economico("Fiat Novo Uno", "988911891", "Econômico", 2020, 35000.0, false , 2));
-        carros.add(new Economico("Chevrolet Onix", "987654321", "Econômico", 2019, 40000.0, false, 3));
-        carros.add(new Economico("Ford Ka", "567891234", "Econômico", 2010, 22000.0, false, 1));
+        carros.add(new Economico("Fiat Novo Uno", "988911891", "Econômico", 2020, 35000.0, false , 1));
+        carros.add(new Economico("Chevrolet Onix", "987654321", "Econômico", 2019, 40000.0, false, 1));
+        carros.add(new Economico("Ford Ka", "567891234", "Econômico", 2010, 22000.0, false, 2));
 
-        carros.add(new Intermediario("Ford Ka Sedan", "432156789", "Intermediário", 2020, 45000.0, false, 5));
+        carros.add(new Intermediario("Ford Ka Sedan", "432156789", "Intermediário", 2020, 45000.0, false, 1));
         carros.add(new Intermediario("Chevrolet Onix Plus", "789123456", "Intermediário", 2019, 50000.0, false, 1));
         carros.add(new Intermediario("Hyundai HB20S", "345678912", "Intermediário", 2021, 68000.0, false, 2));
 
-        carros.add(new Executivo("Toyota Corolla", "456789123", "Executivo", 2023, 150000.0, false, 3));
-        carros.add(new Executivo("Honda Civic", "321654987", "Executivo", 2021, 185000.0, false, 2));
+        carros.add(new Executivo("Toyota Corolla", "456789123", "Executivo", 2023, 150000.0, false, 2));
+        carros.add(new Executivo("Honda Civic", "321654987", "Executivo", 2021, 185000.0, false, 1));
         carros.add(new Executivo("Chevrolet Cruze", "987123654", "Executivo", 2019, 160000.0, false, 1));
     
         // adiocina clientes 
