@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Scanner;
 
 import implementacoes.CarroImpl;
+import implementacoes.categorias.Economico;
+import implementacoes.categorias.Executivo;
+import implementacoes.categorias.Intermediario;
 import interfaces.Carro;
 import interfaces.Loja;
 import usuarios.Funcionario;
@@ -14,10 +17,9 @@ import usuarios.User;
 public class Cliente {
     public static void main(String[] args) {
         try {            
-            
-            // localhost aq => up linux pc  = 192.168.1.16
+            // pratica 2
             Registry registro = LocateRegistry.getRegistry("localhost", 20003); //Registry.REGISTRY_PORT
-            Loja objetoRemoto = (Loja) registro.lookup("LojaTeste");
+            Loja objetoRemoto = (Loja) registro.lookup("Loja");
 
             // verifica se o objeto registro foi encontrado corretamente
             if (objetoRemoto == null) {
@@ -26,9 +28,12 @@ public class Cliente {
             }
 
             System.out.println("Bem-vindo à loja de carros!");
+
+            // user e senha para autenticação
             User user;
             String login;
 
+            // tenta autenticar
             do {
                 System.out.println("Digite seu Login: ");
                 login = System.console().readLine();
@@ -43,10 +48,11 @@ public class Cliente {
             } while (user == null); // retorna null se não for nada => se for sai do => do While
            
 
-            // pega a instancia de quem está logando
+            // pega a instancia de quem está logando para mostrar os metodos corretos
             if (user instanceof usuarios.Cliente){
                 System.out.println("Bem vindo, " + login);
 
+                // somente metodos cliente
                 int opcao = 0;
                 do {
                     System.out.println("\nEscolha uma opção:");
@@ -60,7 +66,7 @@ public class Cliente {
     
                     Scanner scanner = new Scanner(System.in);
                     switch(opcao) {
-                        case 1:  //ok retorno
+                        case 1:  // listar por categoria em ordem alfabetica ou somente em ordem alfabetica
                             System.out.println("\nDigite 0 para listar por categoria ou digite 1 " +
                             "para listar todos em ordem alfabética");
                             int chaveListar = scanner.nextInt();
@@ -69,13 +75,14 @@ public class Cliente {
                             listaRetornadaCliente = objetoRemoto.listarCarros(chaveListar);
                             System.out.println("");
 
+                            // mostra para o cliente 
                             for (Carro carro : listaRetornadaCliente) { // todos os atributos
                                 System.out.println("Nome = " + carro.getNome() + ", Renavan = " + carro.getRenavan() + 
                                 ", Categoria = " + carro.getCategoria() + ", Ano = " + carro.getAnoFabricacao() + 
                                 ", Preço = " + carro.getPreco() + ", Quantidade disponível = " + carro.getQuantidadeDisponivel());
                             }
                             break;
-                        case 2: //ok retorno
+                        case 2: // buscar carro por nome ou renavan 
                             System.out.println("\nDigite o nome ou o renavan do carro que deseja pesquisar:");
                             String chave = System.console().readLine();
                             CarroImpl carroPesquisadoCliente = objetoRemoto.pesquisarCarro(chave);
@@ -87,21 +94,22 @@ public class Cliente {
                                 System.out.println("\nCarro não encontrado"); // imprimindo pro cliente 
                             }
                             break;
-                        case 3: 
+                        case 3: // quantidade => com base na quantidade disponivel 
                             int quant = objetoRemoto.exibirQuantidadeCarros();
                             System.out.println("\nQuantidade de carros disponívies = " + quant);
                             break;
-                        case 4:
+                        case 4: // comprar carro
                             System.out.println("\nDigite o nome do carro que deseja comprar:");
                             String nomeCarro = System.console().readLine();
                             boolean comprado = objetoRemoto.comprarCarro(nomeCarro);
-                            if(comprado == true){
+                            if(comprado == true){ // testa se tem e se comprou
                                 System.out.println("Carro " + nomeCarro + " comprado com sucesso, Parabéns!");
                             }else{
                                 System.out.println("Carro " + nomeCarro + " não encontrado no nosso sistema!");
                             }
                             break;
                         case 0:
+                            //terminou salva em outro arquivo
                             objetoRemoto.escreverCarrosEmArquivo("D:/Users/vitor/git/Car-Store-Client-Server/CarStore/src/novosCarros.txt");
                             System.out.println("\nObrigado por utilizar a loja de carros!");
                             break;
@@ -112,8 +120,8 @@ public class Cliente {
     
                 } while(opcao != 0);
     
-            }
-            else if(user instanceof Funcionario){
+            } // metodos para funcionario => todos
+            if(user instanceof Funcionario){
                 System.out.println("Bem vindo, "+ login);
 
                 int opcao = 0;
@@ -132,7 +140,7 @@ public class Cliente {
 
                     Scanner scanner = new Scanner(System.in);
                     switch(opcao) {
-                        case 1: //ok retorno
+                        case 1: // adicionar carro
                             System.out.println("\nDigite o renavan do carro que deseja adicionar:");
                             String renavan = System.console().readLine();
 
@@ -147,11 +155,11 @@ public class Cliente {
                             
                             System.out.println("\nDigite o preço do carro que deseja adicionar:");
                             double preco = scanner.nextDouble();
-
+                            
                             CarroImpl carroAdicionado =  objetoRemoto.adicionarCarro(renavan, nome, categoria, ano, preco);
                             System.out.println("\nCarro adicionado = " + carroAdicionado.toString()); // imprimindo pro cliente 
                             break;
-                        case 2: //ok retorno
+                        case 2: // apagar carro
                             System.out.println("\nDigite o nome do carro que deseja apagar:");
                             String apagado = System.console().readLine();
                             CarroImpl carroRemovido = objetoRemoto.apagarCarro(apagado);
@@ -163,7 +171,7 @@ public class Cliente {
                                 System.out.println("\nCarro não encontrado/removido"); // imprimindo pro cliente 
                             }
                             break;
-                        case 3:  //ok retorno
+                        case 3:  // listar (mesmo do cliente)
                             System.out.println("\nDigite 0 para listar por categoria ou digite 1 " +
                             "para listar todos em ordem alfabética");
                             
@@ -178,7 +186,7 @@ public class Cliente {
                                 ", Preço = " + carro.getPreco() + ", Quantidade disponível = " + carro.getQuantidadeDisponivel());
                             }
                             break;
-                        case 4: //ok retorno
+                        case 4: // pesquisar carro (mesmo do cliente)
                             System.out.println("\nDigite o nome ou o renavan do carro que deseja pesquisar:");
                             String chave = System.console().readLine();
                             CarroImpl carroPesquisadoFuncionario = objetoRemoto.pesquisarCarro(chave);
@@ -190,7 +198,7 @@ public class Cliente {
                                 System.out.println("\nCarro não encontrado"); // imprimindo pro cliente 
                             }
                             break;
-                        case 5: // retorno ok
+                        case 5: // alterar carro
                             System.out.println("\nDigite o nome ou o renavan do carro que deseja pesquisar:");
                             String chaveAlterar = System.console().readLine();
                             CarroImpl carroAletarado = objetoRemoto.pesquisarCarro(chaveAlterar);
@@ -217,18 +225,20 @@ public class Cliente {
                                 System.out.println("\nDigite a nova quantidade disponivel:");
                                 int qauntAlte = scanner.nextInt();
 
-                               CarroImpl carroAlterReturn = objetoRemoto.alterarAtributos(chaveAlterar, renavanAlte, nomeAlte, categoriaAlte,anoAlte, precoAlte, qauntAlte);
-                               System.out.println("\nCarro alterado = " + carroAlterReturn.toString()); // imprimindo pro cliente 
-                            }
+                                CarroImpl carroAlterReturn = objetoRemoto.alterarAtributos(chaveAlterar, renavanAlte, nomeAlte, categoriaAlte,anoAlte, precoAlte, qauntAlte);
+                                if(carroAlterReturn instanceof CarroImpl){
+                                    System.out.println("\nCarro alterado = " + carroAlterReturn.toString()); // imprimindo pro cliente 
+                                }
                             else {
                                 System.out.println("Carro pesquisado não encontrado");
                             }
+                        }
                         break;
-                        case 6:
+                        case 6: // quantidade de carros (mesmo de cliente)
                             int quant = objetoRemoto.exibirQuantidadeCarros();
                             System.out.println("\nQuantidade de carros disponívies = " + quant);
                             break;
-                        case 7:
+                        case 7: // comprar carro (mesmo de cliente)
                             System.out.println("\nDigite o nome do carro que deseja comprar:");
                             String nomeCarro = System.console().readLine();
                             boolean comprado = objetoRemoto.comprarCarro(nomeCarro);
@@ -240,21 +250,19 @@ public class Cliente {
                             }
                             break;
                         case 0:
-                        objetoRemoto.escreverCarrosEmArquivo("D:/Users/vitor/git/Car-Store-Client-Server/CarStore/src/novosCarros.txt");
-                        System.out.println("\nObrigado por utilizar a loja de carros!");
+                        // salva em arquivo diferente
+                            objetoRemoto.escreverCarrosEmArquivo("D:/Users/vitor/git/Car-Store-Client-Server/CarStore/src/novosCarros.txt");
+                            System.out.println("\nObrigado por utilizar a loja de carros!");
                             break;
                         default:
                             System.out.println("\nOpção inválida. Tente novamente.");
                             break;
                     }
-
                 } while(opcao != 0);
-
             } 
         } catch (Exception e) {
             System.err.println("Erro: " + e.getMessage());
             e.printStackTrace();
         }
-        
     }
 }

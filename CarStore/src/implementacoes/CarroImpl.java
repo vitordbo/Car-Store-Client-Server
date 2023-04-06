@@ -18,7 +18,7 @@ public class CarroImpl implements Carro, Serializable {
    }
 
    public CarroImpl(String nome, String renavan, String categoria, int ano, double preco, 
-   boolean vendido, int quantidadeDisponivel) {
+   int quantidadeDisponivel) {
       this.nome = nome;
       this.renavan = renavan;
       this.categoria = categoria;

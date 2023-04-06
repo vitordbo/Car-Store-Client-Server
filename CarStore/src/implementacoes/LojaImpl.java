@@ -7,6 +7,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
+import implementacoes.categorias.Economico;
+import implementacoes.categorias.Executivo;
+import implementacoes.categorias.Intermediario;
 import interfaces.Carro;
 import interfaces.Loja;
 import usuarios.Cliente;
@@ -30,11 +33,11 @@ public class LojaImpl implements Loja, Serializable {
     public LojaImpl(String arquivo){ // passa o arquivo la no servidor
         // adiocina clientes 
         clientes.add(new Cliente("Vitor", "12345"));
-        clientes.add(new Cliente("Paulo", "senha"));
+        clientes.add(new Cliente("Pedro", "senha"));
 
         // adiocina funcionarios 
-        funcionarios.add(new Funcionario("Pedro", "12345"));
-        funcionarios.add(new Funcionario("Joao", "senha"));
+        funcionarios.add(new Funcionario("Paulo", "senha"));
+        funcionarios.add(new Funcionario("Joao", "12345"));
         
         this.arquivo = arquivo;
         carros = new ArrayList<CarroImpl>();
@@ -53,9 +56,8 @@ public class LojaImpl implements Loja, Serializable {
                 String categoria = campos[2];
                 int ano = Integer.parseInt(campos[3]);
                 double preco = Double.parseDouble(campos[4]);
-                boolean disponivel = Boolean.parseBoolean(campos[5]);
-                int quantidade = Integer.parseInt(campos[6]);
-                CarroImpl carro = new CarroImpl(nome, renavan, categoria, ano, preco, disponivel, quantidade);
+                int quantidade = Integer.parseInt(campos[5]);
+                CarroImpl carro = new CarroImpl(nome, renavan, categoria, ano, preco, quantidade);
                 carros.add(carro);
             }
             leitor.close();
@@ -75,18 +77,6 @@ public class LojaImpl implements Loja, Serializable {
             System.err.println("Erro ao escrever carros no arquivo: " + e.getMessage());
         }
     }
-    
-
-    public LojaImpl() throws RemoteException { // posso passar pro outro construtor
-        // adiocina clientes 
-        clientes.add(new Cliente("Vitor", "12345"));
-        clientes.add(new Cliente("Paulo", "senha"));
-
-        // adiocina funcionarios 
-        funcionarios.add(new Funcionario("Pedro", "12345"));
-        funcionarios.add(new Funcionario("Joao", "senha"));
-    }
-
 
     /* 1.
      * Adicionar Carro
@@ -99,14 +89,13 @@ public class LojaImpl implements Loja, Serializable {
     */
     @Override // ok pro funcionario 
     public CarroImpl adicionarCarro(String renavan, String nome, String categoria, int ano, double preco) throws RemoteException {
-        CarroImpl novoCarro = new CarroImpl(nome, renavan, categoria, ano, preco, false, 1);
+        CarroImpl novoCarro = new CarroImpl(nome, renavan, categoria, ano, preco, 1);
         carros.add(novoCarro);
         
         System.out.println("\nCarro adicionado: " + novoCarro.getNome());
         exibirQuantidadeCarros();
         return novoCarro;
     }
-
 
     /* 2.
      * Apagar carro
@@ -228,7 +217,6 @@ public class LojaImpl implements Loja, Serializable {
                 carro.setPreco(precoAlte);
                 carro.setQuantidadeDisponivel(qauntAlte);
                 carro.setRenavan(renavanAlte);
-                
                 System.out.println("Carro alterado: " + nomeAlte);
                 exibirQuantidadeCarros();
                 return carro;
@@ -236,7 +224,6 @@ public class LojaImpl implements Loja, Serializable {
         }
         return null;
     }
-
 
 
     /* 6.

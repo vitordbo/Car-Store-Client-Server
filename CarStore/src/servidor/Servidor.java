@@ -9,6 +9,7 @@ import interfaces.Loja;
 public class Servidor {
     public static void main(String args[]) {
  
+        // pratica 3
         try {
             //criar objeto servidor
             LojaImpl refObjetoRemoto = new LojaImpl("D:/Users/vitor/git/Car-Store-Client-Server/CarStore/src/carros.txt");
@@ -21,7 +22,7 @@ public class Servidor {
             
             /* O método bind é então chamado no stub do registro para vincular
             * o stub do objeto remoto ao nome "Hello" no registro.*/
-            registro.bind("LojaTeste", skeleton);
+            registro.bind("Loja", skeleton);
             System.err.println("Servidor pronto:");
 
         } catch (Exception e) {

@@ -2,6 +2,7 @@ package usuarios;
 
 import java.io.Serializable;
 
+// User vai servir de base para CLiente e Funcionario
 public class User implements Serializable{
    public String login;
    public String senha;

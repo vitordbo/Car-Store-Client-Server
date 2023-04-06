@@ -4,6 +4,7 @@ import java.rmi.RemoteException;
 
 import implementacoes.CarroImpl;
 
+// ver categoria, se for Intermediario adiciona com essa classe
 public class Intermediario extends CarroImpl {
    private String nome;
    private String renavan;
@@ -26,13 +27,12 @@ public class Intermediario extends CarroImpl {
       this.quantidadeDisponivel = quantidadeDisponivel;
    }
 
+ 
    @Override
    public String toString() {
-      return "Carro [nome=" + nome + ", renavan=" + renavan + ", categoria=" + categoria + 
-      ", ano=" + ano + ", preco=" + preco + ", quantidade disponivel=" + quantidadeDisponivel + "]";
+      return "Nome=" + nome + ", renavan=" + renavan + ", categoria=" + categoria + 
+      ", ano=" + ano + ", preco=" + preco + ", quantidade disponivel=" + quantidadeDisponivel;
    }
-
-
    
    @Override
    public String getRenavan() throws RemoteException {

@@ -4,6 +4,7 @@ import java.rmi.RemoteException;
 
 import implementacoes.CarroImpl;
 
+// ver categoria, se for Economico adiciona com essa classe
 public class Economico extends CarroImpl {
    private String nome;
    private String renavan;
@@ -28,8 +29,8 @@ public class Economico extends CarroImpl {
 
    @Override
    public String toString() {
-      return "Carro [nome=" + nome + ", renavan=" + renavan + ", categoria=" + categoria + 
-      ", ano=" + ano + ", preco=" + preco + ", quantidade disponivel=" + quantidadeDisponivel + "]";
+      return "Nome=" + nome + ", renavan=" + renavan + ", categoria=" + categoria + 
+      ", ano=" + ano + ", preco=" + preco + ", quantidade disponivel=" + quantidadeDisponivel;
    }
 
    

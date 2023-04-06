@@ -1,6 +1,6 @@
 package usuarios;
 
-// acho que da pra tirar o implemntes e separar no switch
+// extends de user
 public class Cliente extends User  {
 
     // contrutor para criar na loja
