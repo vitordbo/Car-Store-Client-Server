@@ -1,9 +1,0 @@
-Nome=Fiat Novo Uno, renavan=988911898, categoria=Econômico, ano=2020, preco=35000.0, quantidade disponivel=1
-Nome=Chevrolet Onix, renavan=987654321, categoria=Econômico, ano=2019, preco=40000.0, quantidade disponivel=1
-Nome=Ford Ka, renavan=567891234, categoria=Econômico, ano=2010, preco=22000.0, quantidade disponivel=2
-Nome=Ford Ka Sedan, renavan=432156789, categoria=Intermediário, ano=2020, preco=45000.0, quantidade disponivel=1
-Nome=Chevrolet Onix Plus, renavan=789123456, categoria=Intermediário, ano=2019, preco=50000.0, quantidade disponivel=1
-Nome=Hyundai HB20S, renavan=345678912, categoria=Intermediário, ano=2021, preco=68000.0, quantidade disponivel=2
-Nome=Toyota Corolla, renavan=456789123, categoria=Executivo, ano=2023, preco=150000.0, quantidade disponivel=2
-Nome=Honda Civic, renavan=321654987, categoria=Executivo, ano=2021, preco=185000.0, quantidade disponivel=1
-Nome=Chevrolet Cruze, renavan=987123654, categoria=Executivo, ano=2019, preco=160000.0, quantidade disponivel=1
