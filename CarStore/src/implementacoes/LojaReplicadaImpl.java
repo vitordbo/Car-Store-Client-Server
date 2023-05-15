@@ -12,6 +12,7 @@ import implementacoes.categorias.Executivo;
 import implementacoes.categorias.Intermediario;
 import interfaces.Carro;
 import interfaces.Loja;
+import replicacao.ReplicadorDeArquivos;
 import usuarios.Cliente;
 import usuarios.Funcionario;
 import usuarios.User;
@@ -22,15 +23,17 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
 
-public class LojaImpl implements Loja, Serializable {
-
+public class LojaReplicadaImpl implements Loja, Serializable{
+    
     private static final long serialVersionUID = 1L;
     private List<CarroImpl> carros;
     private static List<Cliente> clientes = new ArrayList<>();
     private static List<Funcionario> funcionarios = new ArrayList<>();
     private String arquivo;
+    private List<LojaReplicadaImpl> listaReplicas; //armazena instancia das replicas
 
-    public LojaImpl(String arquivo){ // passa o arquivo la no servidor
+
+    public LojaReplicadaImpl(String arquivo){ // passa o arquivo la no servidor
         // adiocina clientes 
         clientes.add(new Cliente("Vitor", "12345"));
         clientes.add(new Cliente("Pedro", "senha"));
@@ -41,8 +44,28 @@ public class LojaImpl implements Loja, Serializable {
         
         this.arquivo = arquivo;
         carros = new ArrayList<CarroImpl>();
-        lerCarrosDoArquivo();
+
+        lerCarrosDoArquivo(); 
     }
+
+    public void adicionarReplica(LojaReplicadaImpl replica) {
+        listaReplicas.add(replica);
+    }    
+
+    private int indiceAtual = 0;
+
+    private LojaReplicadaImpl getProximaReplica() {
+        int numReplicas = listaReplicas.size();
+        if (numReplicas == 0) {
+            return null;
+        }
+        
+        LojaReplicadaImpl replica = listaReplicas.get(indiceAtual);
+        indiceAtual = (indiceAtual + 1) % numReplicas;
+        
+        return replica;
+    }
+
 
     private void lerCarrosDoArquivo(){
         try {
@@ -66,6 +89,8 @@ public class LojaImpl implements Loja, Serializable {
         }
     }
 
+
+    // chamo no construtor, crias as 3 replicas
     @Override
     public void escreverCarrosEmArquivo(String nomeArquivo) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(nomeArquivo))) {
@@ -79,13 +104,13 @@ public class LojaImpl implements Loja, Serializable {
     }
 
     /* 1.
-     * Adicionar Carro
-     *  Um usuário pode adicionar carros ao
-     *  sistema da loja. Para adicionar, os
-     *  seguintes atributos são fornecidos:
-     *  renavan, nome, categoria, ano de
-     *  fabricação e preço. 
-     *  Atualizar quantidade disponível.
+        * Adicionar Carro
+        *  Um usuário pode adicionar carros ao
+        *  sistema da loja. Para adicionar, os
+        *  seguintes atributos são fornecidos:
+        *  renavan, nome, categoria, ano de
+        *  fabricação e preço. 
+        *  Atualizar quantidade disponível.
     */
     @Override // ok pro funcionario 
     public CarroImpl adicionarCarro(String renavan, String nome, String categoria, int ano, double preco) throws RemoteException {
@@ -98,12 +123,12 @@ public class LojaImpl implements Loja, Serializable {
     }
 
     /* 2.
-     * Apagar carro
-     * Um usuário pode apagar registros de
-     *  carros da loja. Todos os atributos são
-     *  removidos a partir do nome do carro ou
-     *  quando a quantidade disponível chegar
-     *  em zero. 
+        * Apagar carro
+        * Um usuário pode apagar registros de
+        *  carros da loja. Todos os atributos são
+        *  removidos a partir do nome do carro ou
+        *  quando a quantidade disponível chegar
+        *  em zero. 
     */    
     @Override // ok so para funcionario
     public CarroImpl apagarCarro(String nomeCarro) throws RemoteException {
@@ -124,12 +149,12 @@ public class LojaImpl implements Loja, Serializable {
     
 
     /* 3.
-     * Listar carros
-     * Um usuário pode listar os carros da loja
-     *  (com todos os atributos). A listagem pode
-     *  ocorrer por categoria ou de forma geral e
-     *  deve ser apresentada em ordem
-     *  alfabética dos nomes.  
+        * Listar carros
+        * Um usuário pode listar os carros da loja
+        *  (com todos os atributos). A listagem pode
+        *  ocorrer por categoria ou de forma geral e
+        *  deve ser apresentada em ordem
+        *  alfabética dos nomes.  
     */
     @Override // ok para func e cliente
     public List<Carro> listarCarros(int chave) throws RemoteException { // de forma geral => ordem alfabetica dos nomes
@@ -179,9 +204,9 @@ public class LojaImpl implements Loja, Serializable {
 
     
     /* 4.
-     * Pesquisar (consultar) carro
-     *  Um usuário pode realizar uma busca por
-     *  carro a partir de seu nome ou do renavan.
+        * Pesquisar (consultar) carro
+        *  Um usuário pode realizar uma busca por
+        *  carro a partir de seu nome ou do renavan.
     */
     @Override
     public CarroImpl pesquisarCarro(String chave) throws RemoteException { // nome ou Renavam
@@ -200,12 +225,12 @@ public class LojaImpl implements Loja, Serializable {
     }
 
     /* 5.
-     * Alterar atributos de carros
-     * Um usuário pode alterar atributos de
-     * carros armazenados. Exemplo: um
-     * cadastro pode ter sido feito de forma
-     * errada (nome ou data de fabricação
-     * incorretos, etc).
+        * Alterar atributos de carros
+        * Um usuário pode alterar atributos de
+        * carros armazenados. Exemplo: um
+        * cadastro pode ter sido feito de forma
+        * errada (nome ou data de fabricação
+        * incorretos, etc).
     */
     @Override 
     public CarroImpl alterarAtributos(String chave, String renavanAlte, String nomeAlte, String categoriaAlte, int anoAlte, double precoAlte, int qauntAlte) throws RemoteException { 
@@ -227,18 +252,18 @@ public class LojaImpl implements Loja, Serializable {
 
 
     /* 6.
-     * Atualizar listagem de carros enviada aos clientes conectados
-     * Adicionar, apagar e alterar atributos de
-     * carros são operações que fazem com que
-     * o servidor tenha que atualizar os clientes
-     * * faz automaticamente
+        * Atualizar listagem de carros enviada aos clientes conectados
+        * Adicionar, apagar e alterar atributos de
+        * carros são operações que fazem com que
+        * o servidor tenha que atualizar os clientes
+        * * faz automaticamente
     */
 
     /* 7.
-     * Exibir quantidade de carros
-     * Um usuário pode consultar o sistema
-     * para saber quantos carros estão
-     * armazenados em um dado momento. 
+        * Exibir quantidade de carros
+        * Um usuário pode consultar o sistema
+        * para saber quantos carros estão
+        * armazenados em um dado momento. 
     */
     @Override
     public int exibirQuantidadeCarros() throws RemoteException {
@@ -253,8 +278,8 @@ public class LojaImpl implements Loja, Serializable {
     }
 
     /* 8.
-     * Um usuário pode efetuar a compra de um
-     * carro após consulta e análise de preço. 
+        * Um usuário pode efetuar a compra de um
+        * carro após consulta e análise de preço. 
     */
     @Override // ok para funcionario e cliente
     public boolean comprarCarro(String nomeCarro) throws RemoteException {
@@ -265,7 +290,7 @@ public class LojaImpl implements Loja, Serializable {
                 break;
             }
         }
-       
+        
         if (carro == null) {
             System.out.println("Carro não encontrado na loja");
             return false; // carro não encontrado na loja
@@ -307,8 +332,11 @@ public class LojaImpl implements Loja, Serializable {
 
     @Override
     public String obterProximaReplica() throws RemoteException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'obterProximaReplica'");
+        return arquivo;
+        // Add the logic to obtain the next replica server address
+        // and return it as a String
+        // ...
     }
     
 }
+    
