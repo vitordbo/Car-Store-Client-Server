@@ -9,7 +9,7 @@ import interfaces.Loja;
 public class Servidor {
     public static void main(String args[]) {
  
-        // pratica 3
+        // utilizado na pratica-offline 2
         try {
             //criar objeto servidor
             LojaImpl refObjetoRemoto = new LojaImpl("D:/Users/vitor/git/Car-Store-Client-Server/CarStore/src/carros.txt");
@@ -31,5 +31,3 @@ public class Servidor {
         }
     }
 }
-
-    

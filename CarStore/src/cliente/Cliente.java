@@ -6,9 +6,6 @@ import java.util.List;
 import java.util.Scanner;
 
 import implementacoes.CarroImpl;
-import implementacoes.categorias.Economico;
-import implementacoes.categorias.Executivo;
-import implementacoes.categorias.Intermediario;
 import interfaces.Carro;
 import interfaces.Loja;
 import usuarios.Funcionario;
