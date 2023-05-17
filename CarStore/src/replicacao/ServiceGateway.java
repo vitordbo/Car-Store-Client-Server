@@ -1,47 +1,48 @@
-package implementacoes;
+package replicacao;
 
-import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Scanner;
-
-import implementacoes.categorias.Economico;
-import implementacoes.categorias.Executivo;
-import implementacoes.categorias.Intermediario;
 import interfaces.Carro;
 import interfaces.Loja;
 import usuarios.Cliente;
 import usuarios.Funcionario;
 import usuarios.User;
 
-import java.io.BufferedWriter;
 import java.io.File;
+import java.rmi.RemoteException;
+import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Scanner;
 
-public class LojaImpl implements Loja, Serializable {
+import implementacoes.CarroImpl;
 
-    private static final long serialVersionUID = 1L;
+public class ServiceGateway implements Loja {
+    private Loja[] replicas;
+    private int currentReplicaIndex = 0;
     private List<CarroImpl> carros;
     private static List<Cliente> clientes = new ArrayList<>();
     private static List<Funcionario> funcionarios = new ArrayList<>();
-    private String arquivo;
+    private String arquivo = "D:/Users/vitor/git/Car-Store-Client-Server/CarStore/src/arquivos/carros.txt";
+    private boolean isLeader;
 
-    public LojaImpl(String arquivo){ // passa o arquivo la no servidor
-        // adiocina clientes 
-        clientes.add(new Cliente("Vitor", "12345"));
-        clientes.add(new Cliente("Pedro", "senha"));
+    public ServiceGateway(Loja[] replicas, boolean isLeader) {
+        this.replicas = replicas;
+        this.currentReplicaIndex = 0;
 
-        // adiocina funcionarios 
-        funcionarios.add(new Funcionario("Paulo", "senha"));
-        funcionarios.add(new Funcionario("Joao", "12345"));
-        
-        this.arquivo = arquivo;
+         // adiocina clientes 
+         clientes.add(new Cliente("Vitor", "12345"));
+         clientes.add(new Cliente("Pedro", "senha"));
+ 
+         // adiocina funcionarios 
+         funcionarios.add(new Funcionario("Paulo", "senha"));
+         funcionarios.add(new Funcionario("Joao", "12345"));
+          
         carros = new ArrayList<CarroImpl>();
         lerCarrosDoArquivo();
+        this.isLeader = isLeader;
     }
 
     private void lerCarrosDoArquivo(){
@@ -66,15 +67,25 @@ public class LojaImpl implements Loja, Serializable {
         }
     }
 
-    @Override
-    public void escreverCarrosEmArquivo(String nomeArquivo) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(nomeArquivo))) {
-            for (Carro carro : carros) {
-                writer.write(carro.toString());
-                writer.newLine();
-            }
-        } catch (IOException e) {
-            System.err.println("Erro ao escrever carros no arquivo: " + e.getMessage());
+    public void mostraQualReplica(){
+        System.out.println("-------------------------");
+        System.out.println("Replica Utilizada = " + currentReplicaIndex);
+        System.out.println("-------------------------");
+    }
+
+    // round robin
+    private void redirecionarParaProximaReplica() {
+        currentReplicaIndex = (currentReplicaIndex + 1) % replicas.length;
+    }
+
+    public void falha(){
+        // Simula uma falha no algoritmo de balanceamento de carga
+        try {
+            Thread.sleep(5000); // Aguarda 5 segundos antes de redirecionar
+        } catch (InterruptedException e) {
+           // Lida com a exceção
+           System.out.println("Falha gerada com sleep. Redirecionando para outra réplica...");
+           redirecionarParaProximaReplica();
         }
     }
 
@@ -87,13 +98,25 @@ public class LojaImpl implements Loja, Serializable {
      *  fabricação e preço. 
      *  Atualizar quantidade disponível.
     */
-    @Override // ok pro funcionario 
-    public CarroImpl adicionarCarro(String renavan, String nome, String categoria, int ano, double preco) throws RemoteException {
+    @Override
+    public CarroImpl adicionarCarro(String renavan, String nome, String categoria, int ano, double preco) throws RemoteException{
         CarroImpl novoCarro = new CarroImpl(nome, renavan, categoria, ano, preco, 1);
         carros.add(novoCarro);
-        
+                
         System.out.println("\nCarro adicionado: " + novoCarro.getNome());
         exibirQuantidadeCarros();
+        
+        if (isLeader) {
+            // Atualiza as réplicas
+            for (int i = 0; i < replicas.length; i++) {
+                if (replicas[i] != this) {
+                    replicas[i].adicionarCarro(renavan, nome, categoria, ano, preco);
+                    System.out.println("Atualizado na réplica " + i);
+                }
+            }
+        }
+
+        mostraQualReplica();
         return novoCarro;
     }
 
@@ -108,20 +131,34 @@ public class LojaImpl implements Loja, Serializable {
     @Override // ok so para funcionario
     public CarroImpl apagarCarro(String nomeCarro) throws RemoteException {
         Iterator<CarroImpl> iter = carros.iterator(); // Iterator para não dar erro
+        
         while (iter.hasNext()) {
             CarroImpl carro = iter.next();
+            
             if (carro.getNome().equalsIgnoreCase(nomeCarro)) {
                 iter.remove();
                 System.out.println("Carro removido: " + nomeCarro);
                 exibirQuantidadeCarros();
+                
+                if (isLeader) {
+                    // Atualiza as réplicas
+                    for (int i = 0; i < replicas.length; i++) {
+                        if (replicas[i] != this) {
+                            replicas[i].apagarCarro(nomeCarro);
+                            System.out.println("Atualizado na réplica " + i);
+                        }
+                    }
+                }
+                mostraQualReplica();
+                redirecionarParaProximaReplica();
                 return carro;
             }
         }
+
         System.out.println("\nNão foi encontrado nenhum carro com o nome " + nomeCarro + ".");
         System.out.println("-------------------------");
         return null;
     }
-    
 
     /* 3.
      * Listar carros
@@ -131,10 +168,18 @@ public class LojaImpl implements Loja, Serializable {
      *  deve ser apresentada em ordem
      *  alfabética dos nomes.  
     */
-    @Override // ok para func e cliente
+    @Override 
     public List<Carro> listarCarros(int chave) throws RemoteException { // de forma geral => ordem alfabetica dos nomes
         List<Carro> carrosRetorno = new ArrayList<>();
+        
+        
         if(chave == 0){
+            
+            // Simula uma falha no algoritmo de balanceamento de carga
+            Thread.currentThread().interrupt();
+            falha();
+            mostraQualReplica(); // para qual foi com a falha
+
             System.out.println("Carros disponiveis por categoria = \n-------------------------");
             Collections.sort(carros, (c1, c2) -> { // collection para deixar em ordem alfabetica
                 try {
@@ -144,18 +189,23 @@ public class LojaImpl implements Loja, Serializable {
                 }
                 return 0;
             });
+        
             for (Carro carro : carros) { // todos os atributos
                 carrosRetorno.add(carro);
                 System.out.println("Nome = " + carro.getNome() + ", Renavan = " + carro.getRenavan() + 
                 ", Categoria = " + carro.getCategoria() + ", Ano = " + carro.getAnoFabricacao() + 
                 ", Preço = " + carro.getPreco() + ", Quantidade disponível = " + carro.getQuantidadeDisponivel());
             }
-            System.out.println("-------------------------");
+
+            mostraQualReplica();
+
+            //redirecionarParaProximaReplica();
             return carrosRetorno;
         }
         
         if (chave == 1){
             System.out.println("Carros disponiveis em ordem alfabetica = \n-------------------------");
+        
             Collections.sort(carros, (c1, c2) -> { // collection para deixar em ordem alfabetica
                 try {
                     return c1.getNome().compareTo(c2.getNome());
@@ -164,6 +214,7 @@ public class LojaImpl implements Loja, Serializable {
                 }
                 return 0;
             });
+        
             for (Carro carro : carros) { // todos os atributos
                 carrosRetorno.add(carro);
                 System.out.println("Nome = " + carro.getNome() + ", Renavan = " + carro.getRenavan() + 
@@ -171,13 +222,13 @@ public class LojaImpl implements Loja, Serializable {
                 ", Preço = " + carro.getPreco() + ", Quantidade disponível = " + carro.getQuantidadeDisponivel());
             }
 
-            System.out.println("-------------------------");
+            mostraQualReplica();
+            redirecionarParaProximaReplica();            
             return carrosRetorno;
         }
         return null; // caso de erro 
     }
 
-    
     /* 4.
      * Pesquisar (consultar) carro
      *  Um usuário pode realizar uma busca por
@@ -187,13 +238,17 @@ public class LojaImpl implements Loja, Serializable {
     public CarroImpl pesquisarCarro(String chave) throws RemoteException { // nome ou Renavam
         for (CarroImpl carro : this.carros) {
             if (carro.getNome().equalsIgnoreCase(chave) || carro.getRenavan().equalsIgnoreCase(chave)) {
+                
                 System.out.println("Carro encontrado!!" + "\nNome = " + carro.getNome() + ", Renavan = " + carro.getRenavan() + 
                 ", Categoria = " + carro.getCategoria() + ", Ano = " + carro.getAnoFabricacao() + 
                 ", Preço = " + carro.getPreco() + ", Quantidade disponível = " + carro.getQuantidadeDisponivel());
-                System.out.println("-------------------------");
+                
+                mostraQualReplica();       
+                redirecionarParaProximaReplica();
                 return carro;
             }
         }
+
         System.out.println("Carro não encontrado!");
         System.out.println("-------------------------");
         return null;
@@ -219,6 +274,20 @@ public class LojaImpl implements Loja, Serializable {
                 carro.setRenavan(renavanAlte);
                 System.out.println("Carro alterado: " + nomeAlte);
                 exibirQuantidadeCarros();
+                System.out.println("-------------------------");
+
+                if (isLeader) {
+                    // Atualiza as réplicas
+                    for (int i = 0; i < replicas.length; i++) {
+                        if (replicas[i] != this) {
+                            replicas[i].alterarAtributos(chave, renavanAlte, nomeAlte, categoriaAlte, anoAlte, precoAlte, qauntAlte);
+                            System.out.println("Atualizado na réplica " + i);
+                        }
+                    }
+                }
+                
+                mostraQualReplica();            
+                redirecionarParaProximaReplica();
                 return carro;
             }
         }
@@ -242,13 +311,21 @@ public class LojaImpl implements Loja, Serializable {
     */
     @Override
     public int exibirQuantidadeCarros() throws RemoteException {
+        // Simula uma falha no algoritmo de balanceamento de carga
+        Thread.currentThread().interrupt();
+        falha();
+        mostraQualReplica(); // para qual foi com a falha
+        
         int quantidadeTotal = 0;
 
         for (CarroImpl carro : carros){
             quantidadeTotal += carro.getQuantidadeDisponivel();
         }
         System.out.println("Quantidade de carros disponívies = " + quantidadeTotal);
-        System.out.println("-------------------------");
+
+        mostraQualReplica();
+        
+        //redirecionarParaProximaReplica();
         return quantidadeTotal;
     }
 
@@ -277,15 +354,26 @@ public class LojaImpl implements Loja, Serializable {
             System.out.println("Carro removido: " + carro.getNome());
         }
         System.out.println("Carro com mais de uma Unidade, Quantidade disponível de " + carro.getNome() + " Depois da remoção: " + carro.getQuantidadeDisponivel());
-        System.out.println("-------------------------");
+
+        if (isLeader) {
+            // Atualiza as réplicas
+            for (int i = 0; i < replicas.length; i++) {
+                if (replicas[i] != this) {
+                    replicas[i].exibirQuantidadeCarros();
+                    System.out.println("Atualizado na réplica " + i);
+                }
+            }
+        }
+
+        mostraQualReplica();     
+        redirecionarParaProximaReplica();   
         return true;
     }
 
     @Override
-    // metodo autenticar 
     public User autenticar(String login, String senha) throws RemoteException {
-        // Verifica se o login e a senha correspondem a um cliente
-        for (Cliente cliente : clientes) {
+           // Verifica se o login e a senha correspondem a um cliente
+           for (Cliente cliente : clientes) {
             if (cliente.getLogin().equals(login) && cliente.getSenha().equals(senha)) {
                 System.out.println("Autenticação concluida, você é um cliente");
                 return cliente;
@@ -304,4 +392,17 @@ public class LojaImpl implements Loja, Serializable {
         System.out.println("Seu login ou senha não foi encontrado no nosso sistema");
         return null;
     }
+
+    @Override
+    public void escreverCarrosEmArquivo(String nomeArquivo) throws RemoteException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(nomeArquivo))) {
+            for (Carro carro : carros) {
+                writer.write(carro.toString());
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            System.err.println("Erro ao escrever carros no arquivo: " + e.getMessage());
+        }
+    }
 }
+

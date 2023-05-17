@@ -9,12 +9,11 @@ import java.util.List;
 
 import implementacoes.LojaReplicadaImpl;
 import interfaces.Loja;
-import replicacao.ReplicaRedirector;
+import replicacao.ServiceGateway;
 
 public class SuperServidor {
 
     private static final String[] REPLICA_ADDRESSES = {"endereco_replica1", "endereco_replica2", "endereco_replica3"};
-    private static int currentReplicaIndex = 0;
     public static void main(String[] args) {
         try {
             // Obtém o registro do RMI
@@ -41,7 +40,7 @@ public class SuperServidor {
             Loja[] replicas = replicaList.toArray(new Loja[0]);
     
             // Cria uma instância do objeto do servidor redirecionador
-            ReplicaRedirector redirector = new ReplicaRedirector(replicas);
+            ServiceGateway redirector = new ServiceGateway(replicas, true);
     
             // Exporta o objeto remoto
             Loja stub = (Loja) UnicastRemoteObject.exportObject(redirector, 0);
