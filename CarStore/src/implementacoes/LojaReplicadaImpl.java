@@ -6,13 +6,10 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Stack;
 
-import implementacoes.categorias.Economico;
-import implementacoes.categorias.Executivo;
-import implementacoes.categorias.Intermediario;
 import interfaces.Carro;
 import interfaces.Loja;
-import replicacao.ReplicadorDeArquivos;
 import usuarios.Cliente;
 import usuarios.Funcionario;
 import usuarios.User;
@@ -24,17 +21,40 @@ import java.io.IOException;
 import java.io.Serializable;
 
 public class LojaReplicadaImpl implements Loja, Serializable{
+
+    class Replica {
+
+        Stack<CarroImpl> replicaCarros;
+
+        boolean falha;
+
+        public Replica(){
+            replicaCarros = new Stack<>();
+        }
+
+        public void addCarros(List<CarroImpl> carros) {
+            for (CarroImpl carro : carros) {
+                replicaCarros.push(carro);
+            }
+        }
+        
+    }
+
+    Replica [] replicas = new Replica[3];
     
     private static final long serialVersionUID = 1L;
     private List<CarroImpl> carros;
     private static List<Cliente> clientes = new ArrayList<>();
     private static List<Funcionario> funcionarios = new ArrayList<>();
-    private String arquivo;
-    private List<LojaReplicadaImpl> listaReplicas; //armazena instancia das replicas
+    private String arquivo = "D:/Users/vitor/git/Car-Store-Client-Server/CarStore/src/arquivos/carros.txt";
 
 
-    public LojaReplicadaImpl(String arquivo){ // passa o arquivo la no servidor
-        // adiocina clientes 
+    int indiceAtual = 0;
+
+    // Adicione uma variável estática para armazenar a instância do líder
+    private static LojaReplicadaImpl lider;
+
+    public LojaReplicadaImpl(String arquivo) {
         clientes.add(new Cliente("Vitor", "12345"));
         clientes.add(new Cliente("Pedro", "senha"));
 
@@ -48,25 +68,6 @@ public class LojaReplicadaImpl implements Loja, Serializable{
         lerCarrosDoArquivo(); 
     }
 
-    public void adicionarReplica(LojaReplicadaImpl replica) {
-        listaReplicas.add(replica);
-    }    
-
-    private int indiceAtual = 0;
-
-    private LojaReplicadaImpl getProximaReplica() {
-        int numReplicas = listaReplicas.size();
-        if (numReplicas == 0) {
-            return null;
-        }
-        
-        LojaReplicadaImpl replica = listaReplicas.get(indiceAtual);
-        indiceAtual = (indiceAtual + 1) % numReplicas;
-        
-        return replica;
-    }
-
-
     private void lerCarrosDoArquivo(){
         try {
             File arquivoCarros = new File(arquivo);
@@ -74,6 +75,7 @@ public class LojaReplicadaImpl implements Loja, Serializable{
             while (leitor.hasNextLine()){
                 String linha = leitor.nextLine();
                 String[] campos = linha.split(",");
+               
                 String nome = campos[0];
                 String renavan = campos[1];
                 String categoria = campos[2];
@@ -89,8 +91,6 @@ public class LojaReplicadaImpl implements Loja, Serializable{
         }
     }
 
-
-    // chamo no construtor, crias as 3 replicas
     @Override
     public void escreverCarrosEmArquivo(String nomeArquivo) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(nomeArquivo))) {
@@ -116,7 +116,8 @@ public class LojaReplicadaImpl implements Loja, Serializable{
     public CarroImpl adicionarCarro(String renavan, String nome, String categoria, int ano, double preco) throws RemoteException {
         CarroImpl novoCarro = new CarroImpl(nome, renavan, categoria, ano, preco, 1);
         carros.add(novoCarro);
-        
+        //replicaAtual.carros.add(novoCarro); // Usando a réplica atualizada
+
         System.out.println("\nCarro adicionado: " + novoCarro.getNome());
         exibirQuantidadeCarros();
         return novoCarro;
@@ -133,6 +134,7 @@ public class LojaReplicadaImpl implements Loja, Serializable{
     @Override // ok so para funcionario
     public CarroImpl apagarCarro(String nomeCarro) throws RemoteException {
         Iterator<CarroImpl> iter = carros.iterator(); // Iterator para não dar erro
+        //Iterator<CarroImpl> iter = replicaAtual.carros.iterator(); // Usando a réplica atualizada
         while (iter.hasNext()) {
             CarroImpl carro = iter.next();
             if (carro.getNome().equalsIgnoreCase(nomeCarro)) {
@@ -170,12 +172,15 @@ public class LojaReplicadaImpl implements Loja, Serializable{
                 return 0;
             });
             for (Carro carro : carros) { // todos os atributos
+            //for (Carro carro : replicaAtual.carros) { // Usando a réplica atualizada
                 carrosRetorno.add(carro);
                 System.out.println("Nome = " + carro.getNome() + ", Renavan = " + carro.getRenavan() + 
                 ", Categoria = " + carro.getCategoria() + ", Ano = " + carro.getAnoFabricacao() + 
                 ", Preço = " + carro.getPreco() + ", Quantidade disponível = " + carro.getQuantidadeDisponivel());
             }
-            System.out.println("-------------------------");
+  
+            System.out.println("-------------------------");  
+
             return carrosRetorno;
         }
         
@@ -190,6 +195,7 @@ public class LojaReplicadaImpl implements Loja, Serializable{
                 return 0;
             });
             for (Carro carro : carros) { // todos os atributos
+            //for (Carro carro : replicaAtual.carros) { // Usando a réplica atualizada    
                 carrosRetorno.add(carro);
                 System.out.println("Nome = " + carro.getNome() + ", Renavan = " + carro.getRenavan() + 
                 ", Categoria = " + carro.getCategoria() + ", Ano = " + carro.getAnoFabricacao() + 
@@ -211,6 +217,7 @@ public class LojaReplicadaImpl implements Loja, Serializable{
     @Override
     public CarroImpl pesquisarCarro(String chave) throws RemoteException { // nome ou Renavam
         for (CarroImpl carro : this.carros) {
+        //for (CarroImpl carro : replicaAtual.carros) { // Usando a réplica atualizada 
             if (carro.getNome().equalsIgnoreCase(chave) || carro.getRenavan().equalsIgnoreCase(chave)) {
                 System.out.println("Carro encontrado!!" + "\nNome = " + carro.getNome() + ", Renavan = " + carro.getRenavan() + 
                 ", Categoria = " + carro.getCategoria() + ", Ano = " + carro.getAnoFabricacao() + 
@@ -235,6 +242,7 @@ public class LojaReplicadaImpl implements Loja, Serializable{
     @Override 
     public CarroImpl alterarAtributos(String chave, String renavanAlte, String nomeAlte, String categoriaAlte, int anoAlte, double precoAlte, int qauntAlte) throws RemoteException { 
         for (CarroImpl carro : this.carros) {
+        //for (CarroImpl carro : replicaAtual.carros) { // Usando a réplica atualizada
             if (carro.getNome().equalsIgnoreCase(chave) || carro.getRenavan().equalsIgnoreCase(chave)) {
                 carro.setNome(nomeAlte);
                 carro.setAno(anoAlte);
@@ -328,14 +336,6 @@ public class LojaReplicadaImpl implements Loja, Serializable{
         // Caso não encontre nenhum usuário correspondente
         System.out.println("Seu login ou senha não foi encontrado no nosso sistema");
         return null;
-    }
-
-    @Override
-    public String obterProximaReplica() throws RemoteException {
-        return arquivo;
-        // Add the logic to obtain the next replica server address
-        // and return it as a String
-        // ...
     }
     
 }

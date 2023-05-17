@@ -304,11 +304,4 @@ public class LojaImpl implements Loja, Serializable {
         System.out.println("Seu login ou senha não foi encontrado no nosso sistema");
         return null;
     }
-
-    @Override
-    public String obterProximaReplica() throws RemoteException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'obterProximaReplica'");
-    }
-    
 }

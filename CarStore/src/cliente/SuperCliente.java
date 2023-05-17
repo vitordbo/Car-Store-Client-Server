@@ -7,39 +7,22 @@ import java.util.List;
 import java.util.Scanner;
 
 import implementacoes.CarroImpl;
-import implementacoes.LojaReplicadaImpl;
 import interfaces.Carro;
-import interfaces.GatewayInterface;
 import interfaces.Loja;
 import usuarios.Funcionario;
 import usuarios.User;
 
 public class SuperCliente {
+
     public static void main(String[] args) {
         try {
-            Registry registry = LocateRegistry.getRegistry("localhost", 20003);
-            Loja objetoRemoto = (Loja) registry.lookup("LojaTeste");
-
-            // verifica se o objeto registro foi encontrado corretamente
-            if (objetoRemoto == null) {
-                System.out.println("Não foi possível conectar ao servidor.");
-                System.exit(1);
-            }
-
-            for (int i = 0; i < 10; i++) { // colocar proxima replicação
-                String serverAddress = objetoRemoto.obterProximaReplica();
-                connectToServer(serverAddress, objetoRemoto);
-                // ...
-            }
-            
-        } catch (Exception e) {
-            System.err.println("Erro: " + e.toString());
-            e.printStackTrace();
-        }
-    }
-
-    public static void connectToServer(String address, Loja objetoRemoto) {
-        try {
+            // Obtém o registro do RMI
+            Registry registry = LocateRegistry.getRegistry("localhost", 1099);
+    
+            // Obtém a referência para o objeto ReplicaRedirector
+            Loja replicaRedirector = (Loja) registry.lookup("redirecionador");
+    
+            // Chamadas aos métodos da interface Loja
             System.out.println("Bem-vindo à loja de carros!");
 
             // user e senha para autenticação
@@ -54,12 +37,12 @@ public class SuperCliente {
                 String senha = System.console().readLine();
                 
                 // autenticar com login e senha => pegar retorno com isntance of e fazer o switch diferente
-                user = objetoRemoto.autenticar(login, senha);
+                user = replicaRedirector.autenticar(login, senha);
                 if (user == null){
                     System.out.println("\nNão encontramos seu login ou senha no nosso sistema! Tente novamente: ");
                 }
             } while (user == null); // retorna null se não for nada => se for sai do => do While
-        
+           
 
             // pega a instancia de quem está logando para mostrar os metodos corretos
             if (user instanceof usuarios.Cliente){
@@ -74,9 +57,9 @@ public class SuperCliente {
                     System.out.println("3 - Exibir quantidade de carros disponíveis");
                     System.out.println("4 - Comprar carro");
                     System.out.println("0 - Sair");
-
+    
                     opcao = Integer.parseInt(System.console().readLine());
-
+    
                     Scanner scanner = new Scanner(System.in);
                     switch(opcao) {
                         case 1:  // listar por categoria em ordem alfabetica ou somente em ordem alfabetica
@@ -85,7 +68,7 @@ public class SuperCliente {
                             int chaveListar = scanner.nextInt();
                             
                             List<Carro> listaRetornadaCliente = new ArrayList<>();
-                            listaRetornadaCliente = objetoRemoto.listarCarros(chaveListar);
+                            listaRetornadaCliente = replicaRedirector.listarCarros(chaveListar);
                             System.out.println("");
 
                             // mostra para o cliente 
@@ -98,7 +81,7 @@ public class SuperCliente {
                         case 2: // buscar carro por nome ou renavan 
                             System.out.println("\nDigite o nome ou o renavan do carro que deseja pesquisar:");
                             String chave = System.console().readLine();
-                            CarroImpl carroPesquisadoCliente = objetoRemoto.pesquisarCarro(chave);
+                            CarroImpl carroPesquisadoCliente = replicaRedirector.pesquisarCarro(chave);
 
                             // testa se foi achadp mesmo => se não foi retorna null
                             if (carroPesquisadoCliente instanceof CarroImpl){
@@ -107,14 +90,14 @@ public class SuperCliente {
                                 System.out.println("\nCarro não encontrado"); // imprimindo pro cliente 
                             }
                             break;
-                        case 3: // quantidade => com base na quantidade disponivel 
-                            int quant = objetoRemoto.exibirQuantidadeCarros();
+                        case 3: // quantidade => com base na quantidade disponivel
+                            int quant = replicaRedirector.exibirQuantidadeCarros();
                             System.out.println("\nQuantidade de carros disponívies = " + quant);
                             break;
                         case 4: // comprar carro
                             System.out.println("\nDigite o nome do carro que deseja comprar:");
                             String nomeCarro = System.console().readLine();
-                            boolean comprado = objetoRemoto.comprarCarro(nomeCarro);
+                            boolean comprado = replicaRedirector.comprarCarro(nomeCarro);
                             if(comprado == true){ // testa se tem e se comprou
                                 System.out.println("Carro " + nomeCarro + " comprado com sucesso, Parabéns!");
                             }else{
@@ -123,16 +106,16 @@ public class SuperCliente {
                             break;
                         case 0:
                             //terminou salva em outro arquivo
-                            objetoRemoto.escreverCarrosEmArquivo("D:/Users/vitor/git/Car-Store-Client-Server/CarStore/src/novosCarros.txt");
+                            replicaRedirector.escreverCarrosEmArquivo("D:/Users/vitor/git/Car-Store-Client-Server/CarStore/src/novosCarros.txt");
                             System.out.println("\nObrigado por utilizar a loja de carros!");
                             break;
                         default:
                             System.out.println("\nOpção inválida. Tente novamente.");
                             break;
                     }
-
+    
                 } while(opcao != 0);
-
+    
             } // metodos para funcionario => todos
             if(user instanceof Funcionario){
                 System.out.println("Bem vindo, "+ login);
@@ -169,13 +152,13 @@ public class SuperCliente {
                             System.out.println("\nDigite o preço do carro que deseja adicionar:");
                             double preco = scanner.nextDouble();
                             
-                            CarroImpl carroAdicionado =  objetoRemoto.adicionarCarro(renavan, nome, categoria, ano, preco);
+                            CarroImpl carroAdicionado =  replicaRedirector.adicionarCarro(renavan, nome, categoria, ano, preco);
                             System.out.println("\nCarro adicionado = " + carroAdicionado.toString()); // imprimindo pro cliente 
                             break;
                         case 2: // apagar carro
                             System.out.println("\nDigite o nome do carro que deseja apagar:");
                             String apagado = System.console().readLine();
-                            CarroImpl carroRemovido = objetoRemoto.apagarCarro(apagado);
+                            CarroImpl carroRemovido = replicaRedirector.apagarCarro(apagado);
 
                             // testa se foi removido mesmo => se não foi retorna null
                             if (carroRemovido instanceof CarroImpl){
@@ -190,7 +173,7 @@ public class SuperCliente {
                             
                             int chaveListar = scanner.nextInt();
                             List<Carro> listaRetornada = new ArrayList<>();
-                            listaRetornada = objetoRemoto.listarCarros(chaveListar);
+                            listaRetornada = replicaRedirector.listarCarros(chaveListar);
                             System.out.println("");
 
                             for (Carro carro : listaRetornada) { // todos os atributos
@@ -202,7 +185,7 @@ public class SuperCliente {
                         case 4: // pesquisar carro (mesmo do cliente)
                             System.out.println("\nDigite o nome ou o renavan do carro que deseja pesquisar:");
                             String chave = System.console().readLine();
-                            CarroImpl carroPesquisadoFuncionario = objetoRemoto.pesquisarCarro(chave);
+                            CarroImpl carroPesquisadoFuncionario = replicaRedirector.pesquisarCarro(chave);
 
                             // testa se foi achadp mesmo => se não foi retorna null
                             if (carroPesquisadoFuncionario instanceof CarroImpl){
@@ -214,7 +197,7 @@ public class SuperCliente {
                         case 5: // alterar carro
                             System.out.println("\nDigite o nome ou o renavan do carro que deseja pesquisar:");
                             String chaveAlterar = System.console().readLine();
-                            CarroImpl carroAletarado = objetoRemoto.pesquisarCarro(chaveAlterar);
+                            CarroImpl carroAletarado = replicaRedirector.pesquisarCarro(chaveAlterar);
 
                             if (carroAletarado instanceof CarroImpl) // se for um carro => pode alterar
                             {
@@ -238,7 +221,7 @@ public class SuperCliente {
                                 System.out.println("\nDigite a nova quantidade disponivel:");
                                 int qauntAlte = scanner.nextInt();
 
-                                CarroImpl carroAlterReturn = objetoRemoto.alterarAtributos(chaveAlterar, renavanAlte, nomeAlte, categoriaAlte,anoAlte, precoAlte, qauntAlte);
+                                CarroImpl carroAlterReturn = replicaRedirector.alterarAtributos(chaveAlterar, renavanAlte, nomeAlte, categoriaAlte,anoAlte, precoAlte, qauntAlte);
                                 if(carroAlterReturn instanceof CarroImpl){
                                     System.out.println("\nCarro alterado = " + carroAlterReturn.toString()); // imprimindo pro cliente 
                                 }
@@ -248,14 +231,14 @@ public class SuperCliente {
                         }
                         break;
                         case 6: // quantidade de carros (mesmo de cliente)
-                            int quant = objetoRemoto.exibirQuantidadeCarros();
+                            int quant = replicaRedirector.exibirQuantidadeCarros();
                             System.out.println("\nQuantidade de carros disponívies = " + quant);
                             break;
                         case 7: // comprar carro (mesmo de cliente)
                             System.out.println("\nDigite o nome do carro que deseja comprar:");
                             String nomeCarro = System.console().readLine();
-                            boolean comprado = objetoRemoto.comprarCarro(nomeCarro);
-                        
+                            boolean comprado = replicaRedirector.comprarCarro(nomeCarro);
+                           
                             if(comprado == true){
                                 System.out.println("Carro " + nomeCarro + " comprado com sucesso, Parabéns!");
                             }else{
@@ -264,7 +247,7 @@ public class SuperCliente {
                             break;
                         case 0:
                         // salva em arquivo diferente
-                            objetoRemoto.escreverCarrosEmArquivo("D:/Users/vitor/git/Car-Store-Client-Server/CarStore/src/novosCarros.txt");
+                        replicaRedirector.escreverCarrosEmArquivo("D:/Users/vitor/git/Car-Store-Client-Server/CarStore/src/novosCarros.txt");
                             System.out.println("\nObrigado por utilizar a loja de carros!");
                             break;
                         default:
@@ -277,6 +260,6 @@ public class SuperCliente {
             System.err.println("Erro: " + e.getMessage());
             e.printStackTrace();
         }
-    }
+    }    
 }
 

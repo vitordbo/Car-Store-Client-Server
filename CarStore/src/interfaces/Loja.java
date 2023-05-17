@@ -20,8 +20,6 @@ public interface Loja extends Remote {
     // autenticar
     public User autenticar(String login, String senha) throws RemoteException;
     public void escreverCarrosEmArquivo(String nomeArquivo) throws RemoteException;
-   
-    // replicação
-    String obterProximaReplica() throws RemoteException;
+
 }
 
