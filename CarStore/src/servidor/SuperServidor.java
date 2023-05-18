@@ -18,9 +18,7 @@ public class SuperServidor {
         try {
             // Obtém o registro do RMI
             Registry registry = LocateRegistry.createRegistry(1099);
-    
-            System.out.println("Servidor pronto para receber conexões dos clientes");
-    
+        
             // Verifica se há réplicas disponíveis
             if (REPLICA_ADDRESSES.length == 0) {
                 System.out.println("Não há réplicas disponíveis");
@@ -47,8 +45,8 @@ public class SuperServidor {
     
             // Associa o stub do objeto remoto ao registro
             registry.rebind("redirecionador", stub);
-    
-            System.out.println("Servidor redirecionador registrado no registro RMI");
+
+            System.out.println("Servidor pronto para receber conexões dos clientes");
     
         } catch (RemoteException e) {
             System.err.println("Erro no servidor: " + e.getMessage());
